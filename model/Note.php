@@ -88,7 +88,6 @@ abstract class Note extends Model
         return $data;
     }
 
- 
    public static function get_archives(User $user): array {
     $archives = [];
     $query = self::execute("SELECT id, title FROM notes WHERE owner = :ownerid AND archived = 1 ORDER BY -weight" , ["ownerid" => $user->id]);
@@ -181,6 +180,12 @@ abstract class Note extends Model
         return $notes;
     }
 
+
+    public static function get_max_weight(User $user){
+        $query = self::execute("SELECT MAX(weight) FROM notes WHERE owner = :user", ["user"=> $user->id]);
+        $data = $query->fetchColumn();
+        return $data + 1;
+    }
 
     public static function get_notes_pinned(User $user) : array {
         return self::get_notes($user, true);
