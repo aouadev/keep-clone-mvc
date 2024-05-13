@@ -400,4 +400,11 @@ abstract class Note extends Model
     {
         self::execute("UPDATE notes SET weight = :count, WHERE id = :id", ['count' => $count, 'id' => $idval]);
     }
+    public function share_note(User $user, int $editor) {
+        self::execute("INSERT INTO shares(note, user, editor) VALUES (:note, :user, :editor)", ["note" =>$this->note_id, "user"=>$user, "editor"=>$editor]);
+    }
+
+  
+
+ 
 }

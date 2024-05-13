@@ -260,5 +260,10 @@ class User extends Model
             throw new Exception("Erreur lors de la mise à jour du mot de passe : " . $e->getMessage());
         }
     }
+    public function get_users2() : array{
+        $query = self::execute("SELECT * FROM Users", []);
+        return $query->fetchAll();
+        
+    }
 }
 

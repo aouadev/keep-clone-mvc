@@ -47,11 +47,6 @@ class ControllerNote extends Controller
         }
     }
 
-    public function share_note()
-    {
-        $user = $this->get_user_or_redirect();
-        (new View("share"))->show();
-    }
 
 
     
@@ -305,6 +300,20 @@ class ControllerNote extends Controller
             echo "Les informations requises pour le titre ou le contenu sont manquantes.";
         }
     }
+
+    public function open_shares() {
+        $user = $this->get_user_or_redirect();
+        $aray_users= $user->get_users(); 
+        (new view('shares'))->show(["users" => $aray_users]);   
+        
+    }
+    
+    public function share_note()
+    {
+        $user = $this->get_user_or_redirect();
+        (new View("share"))->show();
+    }
+    
     
 
 }

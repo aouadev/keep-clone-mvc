@@ -934,5 +934,12 @@ input:focus, textarea:focus {
 .modal-content {
   background-color: #313538;
 }
+.combobox {
+  background-color: blue;
+} 
+option {
+  color: #0962ea;
+  background :rgb(27, 197, 27);
+}
 
 
