@@ -302,16 +302,31 @@ class ControllerNote extends Controller
     }
 
     public function open_shares() {
-        $user = $this->get_user_or_redirect();
-        $aray_users= $user->get_users(); 
-        (new view('shares'))->show(["users" => $aray_users]);   
+        if (isset($_GET['param1']) && isset($_GET['param1']) !=="") {
+            $note_id = $_GET['param1'];
+            $user = $this->get_user_or_redirect();
+            $aray_users= $user->get_users();
+            $note = Note::get_note_by_id($note_id);
+            $list_share = $note->share_list();
+            
+            
+            
+        
+         
+            (new view('shares'))->show(["users" => $aray_users, "list" => $list_share]); 
+        }  
         
     }
     
     public function share_note()
     {
-        $user = $this->get_user_or_redirect();
-        (new View("share"))->show();
+        if (isset($_GET['param1']) && isset($_GET['param1']) !== "" && isset($_GET['param2']) && isset($_GET['param2']) !== "") {
+            $note_id = $_GET['param1'];
+            $user_id = $_GET['param2'];
+            $note = Note::get_note_by_id($note_id);
+            $note->share_note($user_id, 0);
+        }
+     
     }
     
     

@@ -403,7 +403,19 @@ abstract class Note extends Model
     public function share_note(User $user, int $editor) {
         self::execute("INSERT INTO shares(note, user, editor) VALUES (:note, :user, :editor)", ["note" =>$this->note_id, "user"=>$user, "editor"=>$editor]);
     }
-
+    public function share_list() : array {
+        $data = [];
+        $query = self::execute("select * from note_shares where note = :id", ['id' => $this->note_id]);
+        $data = $query->fetchAll();
+        foreach($data as &$row) { 
+            $row['editor'] = $row['editor'] == 1 ? "editor" : "reader";
+            $user = User::get_user_by_id($row['user']);
+            $row['full_name'] = $user->full_name ?? 'N/A';
+        }
+        
+        return $data;
+    }
+    
   
 
  

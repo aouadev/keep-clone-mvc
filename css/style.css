@@ -934,12 +934,85 @@ input:focus, textarea:focus {
 .modal-content {
   background-color: #313538;
 }
-.combobox {
-  background-color: blue;
-} 
-option {
-  color: #0962ea;
-  background :rgb(27, 197, 27);
+/*view-share*/ 
+.dropdown {
+  
+  color : white;
+}
+.dropdown-view-share {
+  display:inline-flex;
+  width: 100%;
+  
+}
+.custom-dropdown-users {
+  color:white;
+  border:none;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.custom-dropdown-permission {
+  color: white;
+  border: none;
+  
+  
+}
+.btn-plus {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  
+  
+  
+  
+  
+  
+
+}
+.view-share-title {
+  font-size: 15px;
+  font-weight: 500;
+}
+.col-users {
+  
+  border: 1px solid grey;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-right: none;
+  width:50%;
+}
+.col-permission {
+  width: 160px;
+  border: 1px solid grey;
+  border-right: none;
+  width: 50%;
+}
+.share-item {
+ display: inline-flex; 
+
+  width: 100%;
+}
+.share-name {
+  
+  border : 1px solid grey;
+  border-radius: 5px 0 0 5px;
+  border-right: none;
+  width: 100%;
+}
+.btn-delete {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.btn-recycle {
+  border-radius: 0%;
+  color : white;
+  font-size: 10;
+}
+.view-share-items {
+  
+  width: 90%;
+}
+.dropdown-item {
+  background-color:#202325 ;
+  color: white;
 }
 
 

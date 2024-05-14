@@ -12,7 +12,7 @@
     <?php elseif ($isShared_as_editor == 1) : ?>
         <a class="isShared" href="openNote/edit/<?= $note_id ?>"><span class="material-symbols-outlined">edit</span></a>
     <?php elseif ($archived == 0 && $isShared_as_editor == 0 && $isShared_as_reader == 0) : ?>
-        <a class="share" href="note/open_shares/"><span class="material-symbols-outlined">share</span></a>
+        <a class="share" href="note/open_shares/<?= $note_id ?>"><span class="material-symbols-outlined">share</span></a>
         <?php if ($pinned) : ?>
             <a class="pinned" href="openNote/unpin/<?= $note_id ?>"><span class="material-symbols-rounded">push_pin</span>
             <?php else : ?>
