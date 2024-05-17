@@ -330,9 +330,26 @@ class ControllerNote extends Controller
             $note->share_note($user, $editor);
             $this->redirect("note", "open_shares/$note_id");
         }
-
-     
     }
+    public function editor_and_delete_btn() {
+        if(isset($_GET['param1']) && isset($_GET['param1']) !=="" 
+        && isset($_GET['param2']) && isset($_GET['param1']) !=="") {
+            $note_id = $_GET['param1'];
+            $note = Note::get_note_by_id($note_id);
+            $user_id = $_GET['param2'];
+            if(isset($_POST['editor'])) {
+                $note->set_editor_and_reader($user_id);
+               
+            }
+            else if(isset($_POST['delete'])) {
+                $note->delete_from_share($user_id);
+            }
+            $this->redirect("note", "open_shares/$note_id");
+
+
+        }
+    }
+
     
     
 

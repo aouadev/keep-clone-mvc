@@ -410,5 +410,26 @@ abstract class Note extends Model
         
     }  
 
+    public function set_editor_and_reader(int $user_id): void
+    {
+        if ($this->as_editor($user_id)) {
+            self::execute("UPDATE note_shares SET editor = :val WHERE note = :id And user = :user", ["val" => 0, "id" => $this->note_id, 'user'=>$user_id]);
+        } else {
+            self::execute("UPDATE note_shares SET editor = :val WHERE note = :id", ["val" => 1, "id" => $this->note_id]);
+        }
+    }
+    
+    public function as_editor(int $user_id): bool
+    {
+        $query = self::execute("SELECT editor FROM note_shares WHERE note = :id AND user = :user_id", ['id' => $this->note_id, 'user_id' => $user_id]);
+        $result = $query->fetch();
+        return $result && $result['editor'] == 1;
+    }
+    public function delete_from_share(int $user_id) {
+        self::execute("delete from note_shares where note = :note_id and user = :user_id", ['note_id'=>$this->note_id, 'user_id'=>$user_id]);
+    }
+
+    
+
  
 }

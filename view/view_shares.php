@@ -24,40 +24,49 @@
         <div class="share-list mb-2">
             <?php if(count($list) == 0): ?>
                 <p class="not_shared">This note is not shared yet.</p>
-            <?php else : ?>    
+            <?php else : ?> 
+                
+                 
                 <?php foreach ($list as $row): ?>
+                    <?php $i =$row['user'] ?>
+                    <form action="note/editor_and_delete_btn/<?=$note_id?>/<?=$i?>" method="post">
                 <div class="share-item mb-2">
-                    
-                    <div class="share-name p-2"><?= $row['full_name'] ?> (<?=$row['editor'] ?>)</div>
-                    <button class="btn btn-primary btn-recycle "><img src="images/change_circle.svg" alt="change_circle"></button>
-                    <button class="btn btn-danger btn-delete ">-</button>
+
+                        <div class="share-name p-2"><?= $row['full_name'] ?> (<?=$row['editor'] ?>)</div>
+                        <button name="editor"class="btn btn-primary btn-recycle " type="submit"><img src="images/change_circle.svg" alt="change_circle"></button>
+                        <button name="delete"class="btn btn-danger btn-delete " type="submit">-</button>
+                  
                 </div>
+                    </form>
                 <?php endforeach; ?>
+                
             <?php endif; ?>
         </div>
+        <?php if(count($users)> 0): ?>
         <div class="dropdown-view-share ">
-            <div class=" col-users">
-                <form action="note/share_note/<?=$note_id?>" method="post">
-                <select name="selected_user" class="form-select select-user" aria-label="Default select example">
-                    <option class="dropdown-item" selected>-User-</option>
-                    <?php foreach($users as $user):?>
-                        <option class="dropdown-item" value="<?=$user->full_name?>"><?= $user->full_name ?></option>
-                        <?php endforeach ?>
-                    </select>
+                <div class=" col-users">
+                    <form action="note/share_note/<?=$note_id?>" method="post">
+                    <select name="selected_user" class="form-select select-user" aria-label="Default select example">
+                        <option class="dropdown-item" selected>-User-</option>
+                        <?php foreach($users as $user):?>
+                            <option class="dropdown-item" value="<?=$user->full_name?>"><?= $user->full_name ?></option>
+                            <?php endforeach ?>
+                        </select>
+                    </div>
+                    <div class="col-permission">
+                        <select name="selected_permission" class="form-select select-permission" aria-label="Default select example">
+                            <option class="dropdown-item" selected>-permission-</option>
+                            <option class="dropdown-item" value="Reader">Reader</option>
+                            <option class="dropdown-item" value="Editor">Editor</option>
+                        </select>
+                    </div>
+                    <div class="col-btn ">
+                        <input class="btn btn-primary btn-plus" type="submit" value="+">
+                    </div>
                 </div>
-                <div class="col-permission">
-                    <select name="selected_permission" class="form-select select-permission" aria-label="Default select example">
-                        <option class="dropdown-item" selected>-permission-</option>
-                        <option class="dropdown-item" value="Reader">Reader</option>
-                        <option class="dropdown-item" value="Editor">Editor</option>
-                    </select>
-                </div>
-                <div class="col-btn ">
-                    <input class="btn btn-primary btn-plus" type="submit" value="+">
-                </div>
-            </div>
-        </form>
-    </div>
+            </form>
+        </div>
+    <?php endif; ?>
 </div>
 </body>
 </html>
