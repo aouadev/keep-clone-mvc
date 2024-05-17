@@ -9,11 +9,11 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données : `prwb_2324_a03`
+-- Base de données : `prwb_2324_a12`
 --
-DROP DATABASE IF EXISTS `prwb_2324_a03`;
-CREATE DATABASE IF NOT EXISTS `prwb_2324_a03` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-USE `prwb_2324_a03`;
+DROP DATABASE IF EXISTS `prwb_2324_a12`;
+CREATE DATABASE IF NOT EXISTS `prwb_2324_a12` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+USE `prwb_2324_a12`;
 
 
 DROP TABLE IF EXISTS `users`;
@@ -38,10 +38,12 @@ CREATE TABLE IF NOT EXISTS `notes` (
   `pinned` boolean NOT NULL DEFAULT FALSE,
   `archived` boolean NOT NULL DEFAULT FALSE,
   `weight` double NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 ALTER TABLE `notes` ADD CONSTRAINT `fk_notes_users` FOREIGN KEY (`owner`) REFERENCES `users`(`id`);
+ALTER TABLE `notes` ADD CONSTRAINT `unique_title_owner` UNIQUE (`title`, `owner`);
+ALTER TABLE `notes` ADD CONSTRAINT `unique_weigh_owner` UNIQUE (`weight`, `owner`);
 
 DROP TABLE IF EXISTS `note_shares`;
 CREATE TABLE IF NOT EXISTS `note_shares` (
