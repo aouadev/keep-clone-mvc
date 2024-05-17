@@ -35,24 +35,6 @@ abstract class Note extends Model
     public abstract function update();
 
 
-
-
-    /* public function get_title() : string {
-        return $this->title;
-    }
-
-    public function setTitle(string $title) : void {
-        $this->title = $title;
-    }
-
-    public function  getOwner() {
-        return $this->owner;
-    }
-
-    public function setOwner(User $owner) {
-        $this->owner = $owner;
-    }*/
-
     public static function get_created_at(int $id): String
     {
         $query = self::execute("SELECT created_at from notes WHERE id = :id", ["id" => $id]);
@@ -401,7 +383,7 @@ abstract class Note extends Model
         self::execute("UPDATE notes SET weight = :count, WHERE id = :id", ['count' => $count, 'id' => $idval]);
     }
     public function share_note(User $user, int $editor) {
-        self::execute("INSERT INTO shares(note, user, editor) VALUES (:note, :user, :editor)", ["note" =>$this->note_id, "user"=>$user, "editor"=>$editor]);
+        self::execute("INSERT INTO note_shares(note, user, editor) VALUES (:note, :user, :editor)", ["note" =>$this->note_id, "user"=>$user->id, "editor"=>$editor]);
     }
     public function share_list() : array {
         $data = [];
@@ -415,8 +397,18 @@ abstract class Note extends Model
         
         return $data;
     }
-    
-  
+    public function list_share_users() : array {
+        $query = self::execute("select * from users where id not in (select user from note_shares where note = :id) and id not in (select owner from notes where id = :id)", ["id"=>$this->note_id]);
+        $data = $query->fetchAll();
+        $results = [];
+        foreach ($data as $row) {
+            $results[] = new User($row["mail"], $row["hashed_password"], $row["full_name"], $row["role"]);
+        }
+      
+        return $results;
+      
+        
+    }  
 
  
 }

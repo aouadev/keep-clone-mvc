@@ -304,28 +304,33 @@ class ControllerNote extends Controller
     public function open_shares() {
         if (isset($_GET['param1']) && isset($_GET['param1']) !=="") {
             $note_id = $_GET['param1'];
-            $user = $this->get_user_or_redirect();
-            $aray_users= $user->get_users();
             $note = Note::get_note_by_id($note_id);
+            
+            $aray_users= $note->list_share_users();
+         
             $list_share = $note->share_list();
             
             
             
         
          
-            (new view('shares'))->show(["users" => $aray_users, "list" => $list_share]); 
+            (new view('shares'))->show(["users" => $aray_users, "list" => $list_share, "note_id" => $note_id]); 
         }  
         
     }
     
-    public function share_note()
-    {
-        if (isset($_GET['param1']) && isset($_GET['param1']) !== "" && isset($_GET['param2']) && isset($_GET['param2']) !== "") {
+    public function share_note() {
+        if (isset($_POST['selected_user']) && isset($_POST['selected_permission']) && isset($_GET['param1'])) {
+            $editor = $_POST['selected_permission'] == "Editor" ? 1 : 0;
+            $user_name = $_POST['selected_user'];
+            $user = User::get_user_by_name($user_name);
+            var_dump($user);
             $note_id = $_GET['param1'];
-            $user_id = $_GET['param2'];
             $note = Note::get_note_by_id($note_id);
-            $note->share_note($user_id, 0);
+            $note->share_note($user, $editor);
+            $this->redirect("note", "open_shares/$note_id");
         }
+
      
     }
     

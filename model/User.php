@@ -35,7 +35,18 @@ class User extends Model
             return new User($data["mail"], $data["hashed_password"], $data["full_name"], $data["role"], $data["id"]);
         }
     }
-
+    public static function get_user_by_name(string $user_name): User|false
+    {   $data = [];
+        $query = self::execute("SELECT * FROM Users where full_name = :name", ["name" => trim($user_name)]);
+        var_dump(trim($user_name));
+        $data = $query->fetch();
+        var_dump($data); // tableau vide !
+        if ($query->rowCount() == 0) {
+            return false;
+        } else {
+            return new User($data["mail"], $data["hashed_password"], $data["full_name"], $data["role"], $data["id"]);
+        }
+    }
 
 
     public function persist(): User

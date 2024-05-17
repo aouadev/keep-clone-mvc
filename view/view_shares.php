@@ -22,44 +22,42 @@
         <p class="view-share-title"> Shares :</p>
         <div class="view-share-items">
         <div class="share-list mb-2">
-            <?php foreach ($list as $row): ?>
-            <div class="share-item mb-2">
-                
-                <div class="share-name p-2"><?= $row['full_name'] ?> (<?=$row['editor'] ?>)</div>
-                <button class="btn btn-primary btn-recycle "><img src="images/change_circle.svg" alt="change_circle"></button>
-                <button class="btn btn-danger btn-delete ">-</button>
-            </div>
-            <?php endforeach; ?>
+            <?php if(count($list) == 0): ?>
+                <p class="not_shared">This note is not shared yet.</p>
+            <?php else : ?>    
+                <?php foreach ($list as $row): ?>
+                <div class="share-item mb-2">
+                    
+                    <div class="share-name p-2"><?= $row['full_name'] ?> (<?=$row['editor'] ?>)</div>
+                    <button class="btn btn-primary btn-recycle "><img src="images/change_circle.svg" alt="change_circle"></button>
+                    <button class="btn btn-danger btn-delete ">-</button>
+                </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
-     
-            <div class="dropdown-view-share ">
-                <div class=" col-users">
-                    <div class="dropdown">
-                        <button class="btn  dropdown-toggle custom-dropdown-users " type="button" data-bs-toggle="dropdown" aria-expanded="false">-Users-
-                            </button>
-                            <ul class="dropdown-menu">
-                                <?php foreach($users as $user):?> 
-                                <li><a class="dropdown-item" href="#"><?= $user->full_name ?></a></li>
-                                <?php endforeach ?>
-                            </ul>
-                        </div>
+        <div class="dropdown-view-share ">
+            <div class=" col-users">
+                <form action="note/share_note/<?=$note_id?>" method="post">
+                <select name="selected_user" class="form-select select-user" aria-label="Default select example">
+                    <option class="dropdown-item" selected>-User-</option>
+                    <?php foreach($users as $user):?>
+                        <option class="dropdown-item" value="<?=$user->full_name?>"><?= $user->full_name ?></option>
+                        <?php endforeach ?>
+                    </select>
                 </div>
                 <div class="col-permission">
-                    <div class="dropdown ">
-                        <button class="btn dropdown-toggle custom-dropdown-permission " type="button" data-bs-toggle="dropdown" aria-expanded="false">-Permission-
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Reader</a></li>
-                            <li><a class="dropdown-item" href="#">Editor</a></li>
-                        </ul>
-                    </div>
+                    <select name="selected_permission" class="form-select select-permission" aria-label="Default select example">
+                        <option class="dropdown-item" selected>-permission-</option>
+                        <option class="dropdown-item" value="Reader">Reader</option>
+                        <option class="dropdown-item" value="Editor">Editor</option>
+                    </select>
                 </div>
                 <div class="col-btn ">
-                    <div class="btn btn-primary btn-plus">+</div>
+                    <input class="btn btn-primary btn-plus" type="submit" value="+">
                 </div>
             </div>
-        </div>
+        </form>
     </div>
-                                
-    </body>
+</div>
+</body>
 </html>
