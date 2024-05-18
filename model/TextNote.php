@@ -43,13 +43,14 @@ class TextNote extends Note {
         $data = $query->fetch();
         if (count($data) !== 0) {
             return new TextNote(
-                $data['id'],
+              
                 $data['title'],
                 $data['owner'],
                 $data['created_at'],
+                $data['weight'],
+                $data['id'],
                 $data['pinned'],
                 $data['archived'],
-                $data['weight'],
                 $data['edited_at']
             );
         }

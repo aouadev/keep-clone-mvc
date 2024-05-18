@@ -3,7 +3,7 @@ require_once 'model/User.php';
 require_once 'framework/View.php';
 require_once 'framework/Controller.php';
 
-class ControllerOpenNote extends Controller
+class ControllerOpen_note extends Controller
 {
     public function index(): void
     {
@@ -17,9 +17,11 @@ class ControllerOpenNote extends Controller
             $isShared_as_reader = $note->isShared_as_reader($user_id);
             $as_editor = $note->as_editor($user_id);
             $body = $note->get_content();
+       
+            
         }
         ($note->get_type() == "TextNote" ? new View("open_text_note") : new View("open_checklist_note"))->show([
-            "note" => $note, "note_id" => $note_id, "created" => $this->get_created_time($note_id), "edited" => $this->get_edited_time($note_id),
+            "note" => $note, "note_id" => $note_id, "get_time" => $this->get_time($note_id), "edited" => $this->get_edited_time($note_id),
              "archived" => $archived, "isShared_as_editor" => $isShared_as_editor, "isShared_as_reader" => $isShared_as_reader, "note_body" => $body,
              "pinned" => $pinned, "user_id" => $user_id, "as_editor" => $as_editor
         ]);
@@ -36,6 +38,20 @@ class ControllerOpenNote extends Controller
         $edited_date = Note::get_edited_at($note_id);
         return $edited_date != null ? $this->get_elapsed_time($edited_date) : false;
     }
+    public function get_time($note_id): string {
+        $created_date = Note::get_created_at($note_id);
+        $current_date = date("Y-m-d H:i:s");
+    
+        if ($created_date == $current_date) {
+            return "Created just now.";
+        }
+        $created_time = $this->get_created_time($note_id);
+        $edited_date = Note::get_edited_at($note_id); 
+        $edited_message = $edited_date ? " Edited  " . $this->get_elapsed_time($edited_date) : " Not edited yet";
+        return "Created  $created_time $edited_message";
+      
+    }
+    
 
 
     public function get_elapsed_time(String $date): String
@@ -105,7 +121,7 @@ class ControllerOpenNote extends Controller
             $note_id = $_GET["param1"];
             $note = Note::get_note_by_id($note_id);
             $note->archive();
-            $this->redirect("openNote", "index", $note_id);
+            $this->redirect("open_note", "index", $note_id);
         }
     }
 
@@ -192,7 +208,7 @@ class ControllerOpenNote extends Controller
     }
 
     // Ouvre la vue d'ajout d'une note
-    public function add_text_note(): void
+  /*  public function add_text_note(): void
 {
     $user_id = $this->get_user_or_redirect()->id;
 
@@ -213,7 +229,7 @@ class ControllerOpenNote extends Controller
     ];
 
     $view->show($data);
-}
+}*/
 
 
 }

@@ -144,10 +144,10 @@ class User extends Model
     {
         $errors = [];
         if (!strlen($name) > 0) {
-            $errors[] = "⚠Full Name is required.";
+            $errors[] = "⚠ is required.";
         }
         if (!(strlen($name) >= 3)) {
-            $errors[] = "⚠Full Name must have mutch than 3 char";
+            $errors[] = "⚠must have mutch than 3 char";
         }
         return $errors;
     }
@@ -241,6 +241,17 @@ class User extends Model
     
     public function edit_profile(string $mail, string $name): void{
         self::execute("UPDATE users SET mail =:mail, full_name = :name WHERE id = :id ", ["mail" => $mail, "name"=>$name, "id" => $this->id]);    
+    }
+
+    public function validate_title_note($title){
+        $error = [];
+        $query = self::execute("select title from notes where owner = :user_id and title = :title", ['user_id'=>$this->id, 'title'=>$title]);
+        $data = $query->fetchAll();
+        if (count($data) != 0) {
+            $error[] = "⚠already exists";
+        }
+        return $error;
+        
     }
 }
 

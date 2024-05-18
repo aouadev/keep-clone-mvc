@@ -1,5 +1,7 @@
 <?php
 
+use function PHPSTORM_META\map;
+
 require_once "framework/Model.php";
 require_once "User.php";
 require_once "TextNote.php";
@@ -16,16 +18,18 @@ enum TypeNote
 abstract class Note extends Model
 {
     public function __construct(
-        public int $note_id,
         public String $title,
         public int $owner,
         public string $created_at,
-        public int $pinned,
-        public int $archived,
-        public int $weight,
+        public int $weight = 0,
+        public int $note_id = 0,
+        public int $pinned = 0,
+        public int $archived = 0,
+        
         public ?string $edited_at = NULL
     ) {
     }
+  
 
     public abstract function get_type();
     public abstract function get_content();
@@ -33,6 +37,10 @@ abstract class Note extends Model
     public abstract function get_note();
     public abstract function isPinned();
     public abstract function update();
+
+    public function set_weight($weight) {
+        $this->weight = $weight;
+    }
 
 
     public static function get_created_at(int $id): String
@@ -117,35 +125,33 @@ abstract class Note extends Model
 
 
 
-    /* public function setPinned(bool $pinned) : void {
-        $this->pinned = $pinned;
-    }
-
-    public function  isArchived() : bool {
-        return $this->archived;
-    }
-
-    public function  setArchived(bool $archived) : void {
-        $this->archived = $archived;
-    }*/
+  
 
     public function  get_weight(): int
     {
         return $this->weight;
     }
-
-    public function  set_weight(int $weight): void
-    {
-        $this->weight = $weight;
+    public function insert() : void {
+        self::execute(
+            "INSERT INTO Notes(title,owner,created_at,edited_at,pinned,archived,weight) VALUES (:title,:owner,:created_at,:edited_at,:pinned,:archived,:weight)",
+            [
+                "title" => $this->title,
+                "owner" => $this->owner,
+                "created_at" => $this->created_at,
+                "edited_at" => $this->edited_at,
+                "pinned" => $this->pinned,
+                "archived" => $this->archived,
+                "weight" => $this->weight,
+            ]
+        );
+        $note = self::get_note_by_id(self::lastInsertId());
+        $this->note_id = $note->note_id;
+        if($this->get_type() == TypeNote::TN) {
+            self::execute("INSERT INTO text_notes (id, content) VALUES (:id, :content)", ['id'=>$this->note_id, 'content'=>$this->get_content()]);
+        }
+        
     }
 
-    /*  public function  getEdited_at() : string {
-        return $this->edited_at;
-    }
-
-    public function setEdited_at(string $edited_at) : void {
-        $this->edited_at = $edited_at;
-    }*/
 
 
 
@@ -261,21 +267,7 @@ abstract class Note extends Model
         if ($this->note_id == null) {
             $errors = $this->validate();
             if (empty($errors)) {
-                // Execute the INSERT operation
-                self::execute(
-                    "INSERT INTO Notes(title,owner,created_at,edited_at,pinned,archived,weight) VALUES (:title,:owner,:created_at,:edited_at,:pinned,:archived,:weight)",
-                    [
-                        "title" => $this->title,
-                        "owner" => $this->owner,
-                        "created_at" => $this->created_at,
-                        "edited_at" => $this->edited_at,
-                        "pinned" => $this->pinned,
-                        "archived" => $this->archived,
-                        "weight" => $this->weight,
-                    ]
-                );
-                $note = self::get_note_by_id(self::lastInsertId());
-                $this->note_id = $note->note_id;
+                $this->insert();
                 return $this;
             } else {
                 return $errors;
@@ -357,23 +349,25 @@ abstract class Note extends Model
     {
         if (count($data) !== 0) {
             return Note::is_Text_note($data['id']) ? new TextNote(
-                $data['id'],
+              
                 $data['title'],
                 $data['owner'],
                 $data['created_at'],
+                $data['weight'],
+                $data['id'],
                 $data['pinned'],
                 $data['archived'],
-                $data['weight'],
                 $data['edited_at']
             ) :
                 new CheckListNote(
-                    $data['id'],
+                 
                     $data['title'],
                     $data['owner'],
                     $data['created_at'],
+                    $data['weight'],
+                    $data['id'],
                     $data['pinned'],
                     $data['archived'],
-                    $data['weight'],
                     $data['edited_at']
                 );
         }
@@ -428,6 +422,12 @@ abstract class Note extends Model
     public function delete_from_share(int $user_id) {
         self::execute("delete from note_shares where note = :note_id and user = :user_id", ['note_id'=>$this->note_id, 'user_id'=>$user_id]);
     }
+    public function max_weight()  {
+        $query = self::execute("select MAX(weight) as max_weight from notes where owner = :current_user", ['current_user'=>$this->owner]);
+        $data = $query->fetch();
+        return $data['max_weight'];
+    }
+ 
 
     
 

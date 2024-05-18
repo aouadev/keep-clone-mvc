@@ -50,8 +50,25 @@ class ControllerNote extends Controller
 
 
     
-    public function add_note() : void {  
-        (new view("add_text_note"))->show();  
+    public function add_text_note() : void {
+        $title = '';
+        $user = $this->get_user_or_redirect();
+        $errors = []; 
+        if(isset($_POST['title']) && isset($_POST['content'])) {
+            $title = $_POST['title'];
+            $content = $_POST['content'];
+            $errors = $user->validate_name($title);
+            $errors = array_merge($errors, $user->validate_title_note($title));
+            if(empty($errors)) {
+                $note = new TextNote($title, $user->id, Date("Y-m-d H:i:s"));
+                $weight = $note->max_weight();
+                $note->set_weight($weight+1);
+                $note->set_content($content);
+                $note->persist();
+                $this->redirect("open_note", "index/$note->note_id");
+            }
+        } 
+        (new view("add_text_note"))->show(["errors" => $errors, 'title' =>$title]);  
     }
   
     public function drag_and_drop() {
@@ -165,6 +182,9 @@ class ControllerNote extends Controller
             throw new Exception("Missing ID");
         }
     }
+   /* public function delete_note()  {
+        (new View('confirm_delete_note'))->show();
+    }*/
 
     public function edit_checklist_note(): void
 
@@ -255,51 +275,7 @@ class ControllerNote extends Controller
         }
     }
 
-    public function save_add_text_note() {
-        $user = $this->get_user_or_redirect();
-    
-        if (isset($_POST['title'], $_POST['content'])) {
-            $title = Tools::sanitize($_POST['title']);
-            $content = Tools::sanitize($_POST['content']);
-            
-            // Vérifier la longueur du titre avant de procéder
-            
-            if ((strlen($title) > 2) && (((strlen($content) > 4 && strlen($content) <= 800)) || strlen($content) == 0)){
-                $note = new TextNote(
-                    0,
-                    $title,
-                    $user->id,
-                    date("Y-m-d H:i:s"),
-                    0,
-                    0,
-                    0,
-                    null
-                );
-    
-                // Appeler persist pour insérer ou mettre à jour la note
-                $result = $note->persist();
-                $note->set_content($content);
-                $note->update();
-                if ($result instanceof TextNote) {
-                    $this->redirect("openNote", "index", $result->note_id);
-                    exit();
-                } else {
-                    // Gérer les erreurs de persistance
-                    echo "Erreur lors de la sauvegarde de la note : <br/>";
-                    foreach ($result as $error) {
-                        echo $error . "<br/>";
-                    }
-                }
-            } else {
-                // Gérer l'erreur de longueur du titre
-                $_SESSION['edit_errors'] = ['Respectez les validations.'];
-                $this->redirect("note", "add_note");
-                exit();
-            }
-        } else {
-            echo "Les informations requises pour le titre ou le contenu sont manquantes.";
-        }
-    }
+
 
     public function open_shares() {
         if (isset($_GET['param1']) && isset($_GET['param1']) !=="") {

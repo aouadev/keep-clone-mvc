@@ -20,6 +20,7 @@
    
         <div class="note_body_text">
         <?=$note_body; ?> 
+        
 
     
     

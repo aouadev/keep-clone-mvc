@@ -641,6 +641,9 @@ nav a {
     max-height: 500px;
     
 }
+.add_text_note {
+  background-color: transparent;
+}
 
 /*error edit and add text_note*/
 
@@ -1004,6 +1007,10 @@ input:focus, textarea:focus {
   font-style: italic;
   color: lightgray;
   font-weight: 350;
+}
+.error_add_note_php {
+  position: absolute;
+  top : 170px;
 }
 
 

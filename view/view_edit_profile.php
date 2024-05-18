@@ -19,11 +19,11 @@
             <form action="settings/edit_profile" method="post">
                 <div class="inputbox text">
                     <i class="material-symbols-outlined">mail</i>
-                    <input id="mail" name="mail" type="text" placeholder="<?=$mail?>" value="<?= $mail ?>">
+                    <input id="mail" name="mail" type="text" placeholder="<?=$user->mail?>" value="<?= $mail ?>">
                 </div>
                 <div class="inputbox text">
                     <i class="material-symbols-outlined">person</i>
-                    <input id="full_name" name="name" type="text" placeholder="<?=$name?>" value="<?= $name ?>">
+                    <input id="full_name" name="name" type="text" placeholder="<?=$user->full_name?>" value="<?= $name ?>">
                 </div>
                 <?php if (count($errors) != 0): ?>
                     <div class="errors">

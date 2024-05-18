@@ -35,7 +35,7 @@ class ControllerSettings extends Controller
                     $this->redirect("settings", "settings");
                 }
             }
-            (new View("edit_profile"))->show(["mail" => $user->mail, "name" => $user->full_name, "errors" => $errors]);
+            (new View("edit_profile"))->show(["user"=>$user, "mail" => $mail, "name" => $name, "errors" => $errors]);
         }
 
 

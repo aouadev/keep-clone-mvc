@@ -13,25 +13,36 @@
     <script src="JS/edit_errors.js" ></script>
 </head>
 <body>
-    <form method="post" action="note/save_add_text_note">
+    
+    <form method="post" action="note/add_text_note">
         <div class="edit">
             <a class="back" href="<?= $_SESSION['previous_page'] ?>"><span class="material-symbols-outlined">arrow_back_ios</span></a>
-            <button class="save" type="submit" id="saveButton"><span class="material-symbols-outlined">save</span></button>
+            <input class="material-symbols-outlined save" type="submit" id="saveButton" value='save'>
         </div>
-        <div class="dates">Today's Date: <?= date("Y-m-d H:i:s") ?></div>
+     
         <label for="title" class="title_note_title">Title</label>
-        <input type="text" class="title_edit_note" id="title" name="title" placeholder="Enter note title">
+        <input type="text" class="title_edit_note" id="title" name="title" value="<?= $title ?>">
         <div id="titleError" class="invalid-feedback" style="display: none;"></div>
-
+        <div class="error_add_note_php">
+            <?php if (count($errors) != 0): ?>
+                <div class="errors">
+                    <ul>
+                        <?php foreach ($errors as $error): ?>
+                            <li><?= $error ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                </div>
+            <?php endif; ?>
+        </div>
         <label for="content" class="note_body_title">Text</label>
-        <textarea class="note_body_text" id="content" name="content"></textarea>
+        <textarea class="note_body_text add_text_note" id="content" name="content"></textarea>
         <div id="contentError" class="invalid-feedback" style="display: none;"></div>
     </form>
-
     <script>
     var userId = <?= json_encode($note->owner); ?>;
     console.log(userId); // Pour vérifier que la valeur est correctement passée
-</script>
+    </script>
     <script src="JS/edit_errors.js"></script>
+
 </body>
 </html>
