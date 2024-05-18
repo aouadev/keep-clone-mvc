@@ -324,9 +324,9 @@ class ControllerNote extends Controller
             $editor = $_POST['selected_permission'] == "Editor" ? 1 : 0;
             $note_id = $_GET['param1'];
             $note = Note::get_note_by_id($note_id);
-            $user_name = $_POST['selected_user'];
-            if($user_name != "-User-") {
-                $user = User::get_user_by_name($user_name);
+            $user_id = $_POST['selected_user'];
+            if($user_id != null) {
+                $user = User::get_user_by_id($user_id);
                 $note->share_note($user, $editor);
             }
             $this->redirect("note", "open_shares/$note_id");

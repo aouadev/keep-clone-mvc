@@ -402,7 +402,7 @@ abstract class Note extends Model
         $data = $query->fetchAll();
         $results = [];
         foreach ($data as $row) {
-            $results[] = new User($row["mail"], $row["hashed_password"], $row["full_name"], $row["role"]);
+            $results[] = User::get_user_by_mail($row['mail']);
         }
       
         return $results;
@@ -415,7 +415,7 @@ abstract class Note extends Model
         if ($this->as_editor($user_id)) {
             self::execute("UPDATE note_shares SET editor = :val WHERE note = :id And user = :user", ["val" => 0, "id" => $this->note_id, 'user'=>$user_id]);
         } else {
-            self::execute("UPDATE note_shares SET editor = :val WHERE note = :id", ["val" => 1, "id" => $this->note_id]);
+            self::execute("UPDATE note_shares SET editor = :val WHERE note = :id And user = :user" , ["val" => 1, "id" => $this->note_id, 'user'=>$user_id]);
         }
     }
     

@@ -49,7 +49,7 @@
                     <select name="selected_user" class="form-select select-user" aria-label="Default select example">
                         <option class="dropdown-item" selected>-User-</option>
                         <?php foreach($users as $user):?>
-                            <option class="dropdown-item" value="<?=$user->full_name?>"><?= $user->full_name ?></option>
+                            <option class="dropdown-item" value="<?=$user->id?>"><?= $user->full_name ?></option>
                             <?php endforeach ?>
                         </select>
                     </div>
