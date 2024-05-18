@@ -15,42 +15,29 @@ class ControllerSettings extends Controller
         (new View("settings"))->show(["currentPage" => "settings", "user" => $user, "sharers" => $sharers]);
     }
 
-    // ajouter error et validations
-    public function edit_profile(): void
-    {
+    public function edit_profile(): void {
+        $mail = '';
+        $errors = [];
+        $name = '';
         $user = $this->get_user_or_redirect();
-        $successMessage = null;
-        $errors[] = [];
-        $sharers = $user->shared_by();
-
-
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $newEmail = Tools::sanitize($_POST['email']);
-            $newFullName = Tools::sanitize($_POST['fullName']);
-
-            $errors = User::validateEdit($newEmail, $newFullName, $user);
-
-
-            if (empty($errors)) {
-
-                try {
-                    if ($user->mail == $newEmail && $user->full_name == $newFullName) {
-                        $successMessage = "Nothing to update.";
-                    } else {
-                        $user->updateProfile($newFullName, $newEmail);
-                        $successMessage = "Profil updated !";
-                    }
-                } catch (Exception $e) {
-                    $errors[] = "Error updating profile : " . $e->getMessage();
+        if (isset($_POST['mail']) && isset($_POST['name'])) { //&& isset($_POST['password'])) {
+            $mail = $_POST['mail'];
+                if($mail != $user->mail) {
+                    $errors = $user->validate_unicity($mail);
+                    $errors = array_merge($errors, $user->validate($mail));
                 }
-            } else {
-                $errors = array_merge($errors);
+                $name = $_POST['name'];
+                $errors = array_merge($errors, $user->validate_name($name));
+                if (empty($errors)) {
+                    $user->full_name = $name;
+                    $user->mail = $mail;
+                    $user->edit_profile($mail, $name);
+                    $this->redirect("settings", "settings");
+                }
             }
-            (new View("edit_profile"))->show(["user" => $user, "successMessage" => $successMessage, "errors" => $errors, "sharers" => $sharers]);
-        } else {
-            (new View("edit_profile"))->show(["user" => $user, "sharers" => $sharers]);
+            (new View("edit_profile"))->show(["mail" => $user->mail, "name" => $user->full_name, "errors" => $errors]);
         }
-    }
+
 
     public function change_password(): void
     {

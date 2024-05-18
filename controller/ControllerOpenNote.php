@@ -15,10 +15,13 @@ class ControllerOpenNote extends Controller
             $pinned = $note->is_pinned($user_id);
             $isShared_as_editor = $note->isShared_as_editor($user_id);
             $isShared_as_reader = $note->isShared_as_reader($user_id);
+            $as_editor = $note->as_editor($user_id);
             $body = $note->get_content();
         }
         ($note->get_type() == "TextNote" ? new View("open_text_note") : new View("open_checklist_note"))->show([
-            "note" => $note, "note_id" => $note_id, "created" => $this->get_created_time($note_id), "edited" => $this->get_edited_time($note_id), "archived" => $archived, "isShared_as_editor" => $isShared_as_editor, "isShared_as_reader" => $isShared_as_reader, "note_body" => $body, "pinned" => $pinned, "user_id" => $user_id
+            "note" => $note, "note_id" => $note_id, "created" => $this->get_created_time($note_id), "edited" => $this->get_edited_time($note_id),
+             "archived" => $archived, "isShared_as_editor" => $isShared_as_editor, "isShared_as_reader" => $isShared_as_reader, "note_body" => $body,
+             "pinned" => $pinned, "user_id" => $user_id, "as_editor" => $as_editor
         ]);
     }
 
@@ -58,19 +61,25 @@ class ControllerOpenNote extends Controller
     }
     public function update_checked(): void
     {
-        if (isset($_POST["check"])) {
-            $checklist_item_id = $_POST["check"];
-            $note_id = CheckListNoteItem::get_checklist_note($checklist_item_id);
-            $checked = true;
-            CheckListNoteItem::update_checked($checklist_item_id, $checked);
-        } elseif (isset($_POST["uncheck"])) {
-            $checklist_item_id = $_POST["uncheck"];
-            $note_id = CheckListNoteItem::get_checklist_note($checklist_item_id);
-            $checked = false;
-            CheckListNoteItem::update_checked($checklist_item_id, $checked);
-        }
-        $this->redirect("openNote", "index/$note_id");
-    }
+        if(isset($_GET['param1']) && isset($_GET['param1']) != "") {
+            $note = $_GET['param1'];
+            var_dump($note);
+            if (isset($_GET['param2']) && isset($_GET['param2']) == true) {
+                if (isset($_POST["check"])) {
+                    $checklist_item_id = $_POST["check"];
+                    $note_id = CheckListNoteItem::get_checklist_note($checklist_item_id);
+                    $checked = true;
+                    CheckListNoteItem::update_checked($checklist_item_id, $checked);
+                } elseif (isset($_POST["uncheck"])) {
+                    $checklist_item_id = $_POST["uncheck"];
+                    $note_id = CheckListNoteItem::get_checklist_note($checklist_item_id);
+                    $checked = false;
+                    CheckListNoteItem::update_checked($checklist_item_id, $checked);
+                }
+            }
+            $this->redirect("openNote", "index/$note");
+       }
+}
     
     public function pin(): void
     {

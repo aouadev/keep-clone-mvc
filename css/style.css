@@ -26,6 +26,9 @@ html {
   height: 470px;
 
 }
+.edit_profile {
+  height: 400px;
+}
 
 .main_login_signup .title {
 
@@ -520,19 +523,7 @@ nav a {
   margin: 2em;
 }
 
-/* edit_profile */
 
-.edit_form {
-  position: absolute;
-  top: 120px;
-  left: 300px;
-}
-
-.form-label {
-  color: white;
-  font-size: 15px;
-  font-weight: 300;
-}
 
 /* logout */
 

@@ -12,53 +12,36 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
     <link href="css/style.css" rel="stylesheet" type="text/css" />
 </head>
-
 <body>
-
-
-
-    <div class="title">
-        <div>
-            <h1>Settings</h1>
-        </div>
-        <div class="back-icon">
-            <a href="settings/settings"><span class="material-symbols-outlined">arrow_back_ios</span></a>
+    <div class="container_login_signup">
+        <div class="main_login_signup edit_profile">
+            <div class="title">Edit Profile</div>
+            <form action="settings/edit_profile" method="post">
+                <div class="inputbox text">
+                    <i class="material-symbols-outlined">mail</i>
+                    <input id="mail" name="mail" type="text" placeholder="<?=$mail?>" value="<?= $mail ?>">
+                </div>
+                <div class="inputbox text">
+                    <i class="material-symbols-outlined">person</i>
+                    <input id="full_name" name="name" type="text" placeholder="<?=$name?>" value="<?= $name ?>">
+                </div>
+                <?php if (count($errors) != 0): ?>
+                    <div class="errors">
+                        <ul>
+                            <?php foreach ($errors as $error): ?>
+                                <li><?= $error ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+                <div class="inputbox button login">
+                    <input type="submit" value="Save Change">
+                </div>
+                <div class="inputbox button cancel" >
+                    <input type="button" value="Cancel" onclick="window.location.href='settings/settings';">
+                </div>
+            </form>
         </div>
     </div>
-    <div class="container mt-5">
-        <h2>Edit Profile</h2>
-
-        <form class="edit_form" action="settings/edit_profile" method="post">
-    <div class="mb-3">
-        <label for="email" class="form-label">Mail</label>
-        <input type="email" class="form-control" id="email" name="email" value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : htmlspecialchars($user->mail) ?>" required>
-    </div>
-    <div class="mb-3">
-        <label for="fullName" class="form-label">Name</label>
-        <input type="text" class="form-control" id="fullName" name="fullName" value="<?= isset($_POST['fullName']) ? htmlspecialchars($_POST['fullName']) : htmlspecialchars($user->full_name) ?>" required>
-    </div>
-    <button type="submit" class="btn btn-primary">Save Changes</button>
-</form>
-
-    </div>
-
-    <?php if (!empty($errors)) : ?>
-        <div id="alertPassword" class="alert alert-danger" role="alert">
-            <?php foreach ($errors as $error) : ?>
-                <p><?= $error ?></p>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
-
-
-    <?php if (isset($successMessage)) : ?>
-        <div id="alertPassword" class="alert alert-success" role="alert">
-            <p><?= $successMessage ?></p>
-        </div>
-    <?php endif; ?>
-
-
-
 </body>
-
 </html>

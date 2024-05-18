@@ -322,12 +322,13 @@ class ControllerNote extends Controller
     public function share_note() {
         if (isset($_POST['selected_user']) && isset($_POST['selected_permission']) && isset($_GET['param1'])) {
             $editor = $_POST['selected_permission'] == "Editor" ? 1 : 0;
-            $user_name = $_POST['selected_user'];
-            $user = User::get_user_by_name($user_name);
-            var_dump($user);
             $note_id = $_GET['param1'];
             $note = Note::get_note_by_id($note_id);
-            $note->share_note($user, $editor);
+            $user_name = $_POST['selected_user'];
+            if($user_name != "-User-") {
+                $user = User::get_user_by_name($user_name);
+                $note->share_note($user, $editor);
+            }
             $this->redirect("note", "open_shares/$note_id");
         }
     }
