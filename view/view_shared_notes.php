@@ -12,6 +12,7 @@
 </head>
 <body>
 <?php include("menu.php"); ?>
+<?php $back = "back_shared_by" ?>
     <h1>Shared_by <?=$shared_by_name?></h1>
 
     <div class="shared_by">
@@ -20,7 +21,7 @@
             <div class="shared_editor">
                 <?php foreach ($shared_notes_as_editor as $note_item): ?> 
                     <div class="note-archivee">
-                        <a class="link-note-archivee" href="openNote/index/<?=$note_item["id"]?>">
+                        <a class="link-note-archivee" href="open_note/index/<?=$note_item["id"]?>/<?=$back?>/<?= $shared_by_id ?>">
                             <?php include("note_in_list.php") ?>
                         </a>
                     </div>       
@@ -32,7 +33,7 @@
             <div class="shared_reader">
                 <?php foreach ($shared_notes_as_reader as $note_item): ?>
                     <div class="note-archivee">
-                        <a class="link-note-archivee" href="openNote/index/<?=$note_item["id"]?>">
+                        <a class="link-note-archivee" href="open_note/index/<?=$note_item["id"]?>/<?=$back?>/<?= $shared_by_id ?>">
                             <?php include("note_in_list.php") ?> 
                         </a>
                     </div>       

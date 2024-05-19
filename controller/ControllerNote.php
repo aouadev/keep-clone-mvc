@@ -50,8 +50,25 @@ class ControllerNote extends Controller
 
 
     
-    public function add_note() : void {  
-        (new view("add_text_note"))->show();  
+    public function add_text_note() : void {
+        $title = '';
+        $user = $this->get_user_or_redirect();
+        $errors = []; 
+        if(isset($_POST['title']) && isset($_POST['content'])) {
+            $title = $_POST['title'];
+            $content = $_POST['content'];
+            $errors = $user->validate_name($title);
+            $errors = array_merge($errors, $user->validate_title_note($title));
+            if(empty($errors)) {
+                $note = new TextNote($title, $user->id, Date("Y-m-d H:i:s"));
+                $weight = $note->max_weight();
+                $note->set_weight($weight+1);
+                $note->set_content($content);
+                $note->persist();
+                $this->redirect("open_note", "index/$note->note_id");
+            }
+        } 
+        (new view("add_text_note"))->show(["errors" => $errors, 'title' =>$title]);  
     }
   
     public function drag_and_drop() {
@@ -149,7 +166,7 @@ class ControllerNote extends Controller
     }
 
     // Supprime une note
-    public function delete_note()
+   /* public function delete_note()
     {
         if (isset($_GET["param1"]) && isset($_GET["param1"]) !== "") {
             $note_id = $_GET['param1'];
@@ -164,6 +181,20 @@ class ControllerNote extends Controller
         } else {
             throw new Exception("Missing ID");
         }
+    }*/
+    public function delete_note()  {
+        if (isset($_POST['delete_note'])) {
+            $note_id = $_POST['delete_note'];
+            $note = Note::get_note_by_id($note_id);
+        }
+        if (isset($_POST['delete_confirm'])) {
+            $user = $this->get_user_or_redirect();
+            $note_id = $_POST['delete_confirm'];
+            $note = Note::get_note_by_id($note_id);
+            $note->delete($user);
+               $this->redirect("user", "my_archives");
+        }
+        (new View('confirm_delete'))->show(["note" =>$note]);
     }
 
     public function edit_checklist_note(): void
@@ -255,64 +286,58 @@ class ControllerNote extends Controller
         }
     }
 
-    public function save_add_text_note() {
-        $user = $this->get_user_or_redirect();
-    
-        if (isset($_POST['title'], $_POST['content'])) {
-            $title = Tools::sanitize($_POST['title']);
-            $content = Tools::sanitize($_POST['content']);
-            
-            // Vérifier la longueur du titre avant de procéder
-            
-            if ((strlen($title) > 2) && (((strlen($content) > 4 && strlen($content) <= 800)) || strlen($content) == 0)){
-                $note = new TextNote(
-                    0,
-                    $title,
-                    $user->id,
-                    date("Y-m-d H:i:s"),
-                    0,
-                    0,
-                    0,
-                    null
-                );
-    
-                // Appeler persist pour insérer ou mettre à jour la note
-                $result = $note->persist();
-                $note->set_content($content);
-                $note->update();
-                if ($result instanceof TextNote) {
-                    $this->redirect("openNote", "index", $result->note_id);
-                    exit();
-                } else {
-                    // Gérer les erreurs de persistance
-                    echo "Erreur lors de la sauvegarde de la note : <br/>";
-                    foreach ($result as $error) {
-                        echo $error . "<br/>";
-                    }
-                }
-            } else {
-                // Gérer l'erreur de longueur du titre
-                $_SESSION['edit_errors'] = ['Respectez les validations.'];
-                $this->redirect("note", "add_note");
-                exit();
-            }
-        } else {
-            echo "Les informations requises pour le titre ou le contenu sont manquantes.";
-        }
-    }
+
 
     public function open_shares() {
-        $user = $this->get_user_or_redirect();
-        $aray_users= $user->get_users(); 
-        (new view('shares'))->show(["users" => $aray_users]);   
+        if (isset($_GET['param1']) && isset($_GET['param1']) !=="") {
+            $note_id = $_GET['param1'];
+            $note = Note::get_note_by_id($note_id);
+            
+            $aray_users= $note->list_share_users();
+         
+            $list_share = $note->share_list();
+            
+            
+            
+        
+         
+            (new view('shares'))->show(["users" => $aray_users, "list" => $list_share, "note_id" => $note_id]); 
+        }  
         
     }
     
-    public function share_note()
-    {
-        $user = $this->get_user_or_redirect();
-        (new View("share"))->show();
+    public function share_note() {
+        if (isset($_POST['selected_user']) && isset($_POST['selected_permission']) && isset($_GET['param1'])) {
+            $editor = $_POST['selected_permission'] == "Editor" ? 1 : 0;
+            $note_id = $_GET['param1'];
+            $note = Note::get_note_by_id($note_id);
+            $user_id = $_POST['selected_user'];
+            if($user_id != null) {
+                $user = User::get_user_by_id($user_id);
+                $note->share_note($user, $editor);
+            }
+            $this->redirect("note", "open_shares/$note_id");
+        }
     }
+    public function editor_and_delete_btn() {
+        if(isset($_GET['param1']) && isset($_GET['param1']) !=="" 
+        && isset($_GET['param2']) && isset($_GET['param1']) !=="") {
+            $note_id = $_GET['param1'];
+            $note = Note::get_note_by_id($note_id);
+            $user_id = $_GET['param2'];
+            if(isset($_POST['editor'])) {
+                $note->set_editor_and_reader($user_id);
+               
+            }
+            else if(isset($_POST['delete'])) {
+                $note->delete_from_share($user_id);
+            }
+            $this->redirect("note", "open_shares/$note_id");
+
+
+        }
+    }
+
     
     
 

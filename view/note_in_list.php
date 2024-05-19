@@ -2,7 +2,7 @@
  
             <div class="note-title"><?=$note_item["title"]?></div>
                 <div class="note-content">
-                    <?php if($note_item["content"]): ?>
+                    <?php if($note_item["content"] && $note_item["content"] !== ""): ?>
                         <div class="content_text"><?= $note_item["content"]?></div>
                     <?php elseif($note_item['content_checklist']):?>
                         <div class="content_check">

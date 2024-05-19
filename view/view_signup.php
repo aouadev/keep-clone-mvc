@@ -39,7 +39,8 @@
                 <input type="submit" value="Sign Up">
             </div>
             <div class="inputbox button cancel" >
-                <input type="button" value="Cancel" onclick="window.location.href='main/login';">
+            <a href="main/login" type="button" class="btn btn-outline-danger">Cancel</a>
+               <!-- <input type="button" value="Cancel" onclick="window.location.href='main/login';"> -->
             </div> 
              
     </form> 
