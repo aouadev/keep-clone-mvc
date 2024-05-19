@@ -13,6 +13,7 @@
     <script src="JS/edit_errors.js" ></script>
 </head>
 <body>
+    
     <div class="container mt-3">
         <div class="">
             <a class="back" href="<?= $_SESSION['previous_page'] ?>"><span class="material-symbols-outlined">arrow_back_ios</span></a> 

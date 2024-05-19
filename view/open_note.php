@@ -1,10 +1,17 @@
 <div class="barre">
+    <?php if($back == "back_my_notes"): ?>
+        <?php $back_page = "note/index" ?>
+    <?php elseif($back == "back_archives"): ?>
+        <?php $back_page = "user/my_archives" ?>
+    <?php elseif ($back == "back_shared_by"):?>
+        <?php $back_page= "user/get_shared_by/$param3" ?> 
 
-    <a class="back" href="<?= $_SESSION['previous_page'] ?>"><span class="material-symbols-outlined">arrow_back_ios</span></a>
+    <?php endif; ?>       
+    <a class="back" href= <?=$back_page?>><span class="material-symbols-outlined">arrow_back_ios</span></a>
     <?php if ($archived == 1) : ?>
 
-        <form action="note/delete_note/<?= $note_id ?>" id="deleteForm" method="post">
-            <button class="delete" type="submit" id="delete_icon"><span class="material-symbols-outlined">delete_forever</span></button>
+        <form action="note/delete_note" id="deleteForm" method="post">
+            <button name="delete_note" class="delete" type="submit" id="delete_icon" value="<?= $note_id ?>"><span class="material-symbols-outlined">delete_forever</span></button>
         </form>
         <a class="unarchive" href="open_note/unarchive/<?= $note_id ?>"><span class="material-symbols-outlined">unarchive</span></a>
 
@@ -23,6 +30,7 @@
         <?php endif; ?>
 
 </div>
+
 <div class="dates"><?= $get_time?></div>
 <div class="title_note_title">Title</div>
 <div class="title_note"> <?= $note->title ?></div>

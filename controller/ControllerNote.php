@@ -166,7 +166,7 @@ class ControllerNote extends Controller
     }
 
     // Supprime une note
-    public function delete_note()
+   /* public function delete_note()
     {
         if (isset($_GET["param1"]) && isset($_GET["param1"]) !== "") {
             $note_id = $_GET['param1'];
@@ -181,10 +181,21 @@ class ControllerNote extends Controller
         } else {
             throw new Exception("Missing ID");
         }
-    }
-   /* public function delete_note()  {
-        (new View('confirm_delete_note'))->show();
     }*/
+    public function delete_note()  {
+        if (isset($_POST['delete_note'])) {
+            $note_id = $_POST['delete_note'];
+            $note = Note::get_note_by_id($note_id);
+        }
+        if (isset($_POST['delete_confirm'])) {
+            $user = $this->get_user_or_redirect();
+            $note_id = $_POST['delete_confirm'];
+            $note = Note::get_note_by_id($note_id);
+            $note->delete($user);
+               $this->redirect("user", "my_archives");
+        }
+        (new View('confirm_delete'))->show(["note" =>$note]);
+    }
 
     public function edit_checklist_note(): void
 

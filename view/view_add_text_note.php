@@ -16,7 +16,7 @@
     
     <form method="post" action="note/add_text_note">
         <div class="edit">
-            <a class="back" href="<?= $_SESSION['previous_page'] ?>"><span class="material-symbols-outlined">arrow_back_ios</span></a>
+            <a class="back" href="note/index"><span class="material-symbols-outlined">arrow_back_ios</span></a>
             <input class="material-symbols-outlined save" type="submit" id="saveButton" value='save'>
         </div>
      

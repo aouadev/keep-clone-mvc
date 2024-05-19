@@ -22,7 +22,7 @@
                 update: function(event, ui) {
                     var order = $(this).sortable("serialize") + '&update=update';
                     $.ajax({
-                        url: "note/drag_and_drop",
+                        url: "Controller/drag_and_drop.php",
                         type: "POST",
                         data: order,
                         success: function(response) {
@@ -40,7 +40,7 @@
                 update: function(event, ui) {
                     var order = $(this).sortable("serialize") + '&update=update';
                     $.ajax({
-                        url: "note/drag_and_drop",
+                        url: "Controller/drag_and_drop.php",
                         type: "POST",
                         data: order,
                         success: function(response) {
@@ -58,6 +58,7 @@
 
 <body>
     <?php include('view/menu.php'); ?>
+    <?php $back = "back_my_notes" ?>
     <div class="view_notes_header">
         <h1>My notes</h1>
     </div>
@@ -67,9 +68,9 @@
             <?php for ($i = 0; $i < count($notes_pinned); $i++) { ?>
                 <div class="note">
                     <p class="note-title"><?= $notes_pinned[$i]["title"]; ?></p>
-                    <a class="link-note-archivee" href='open_note/index/<?= $notes_pinned[$i]["id"]; ?>'>
+                    <a class="link-note-archivee" href='open_note/index/<?= $notes_pinned[$i]["id"]; ?>/<?=$back?>/0'>
                         <div class="note-content">
-                            <?php if ($notes_pinned[$i]["content"]) : ?>
+                            <?php if ($notes_pinned[$i]["content"] && $notes_pinned[$i]["content"] !== "") : ?>
                                 <div class="content_text">
                                     <?= $notes_pinned[$i]["content"] ?>
                                 </div>
@@ -113,9 +114,9 @@
         <?php for ($i = 0; $i < count($notes_unpinned); $i++) { ?>
             <div class="note">
                 <p class="note-title"><?= $notes_unpinned[$i]["title"];  ?></p>
-                <a class="link-note-archivee" href='open_note/index/<?= $notes_unpinned[$i]["id"]; ?>'>
+                <a class="link-note-archivee" href='open_note/index/<?= $notes_unpinned[$i]["id"]; ?>/<?=$back?>/0'>
                 <div class="note-content">
-                    <?php if ($notes_unpinned[$i]["content"]) : ?>
+                    <?php if ($notes_unpinned[$i]["content"] && $notes_unpinned[$i]["content"] !== "") : ?>
                         <div class="content_text">
                             <?= $notes_unpinned[$i]["content"] ?>
                         </div>

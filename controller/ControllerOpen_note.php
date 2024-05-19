@@ -17,13 +17,20 @@ class ControllerOpen_note extends Controller
             $isShared_as_reader = $note->isShared_as_reader($user_id);
             $as_editor = $note->as_editor($user_id);
             $body = $note->get_content();
+            if (isset($_GET["param2"])) {
+                $previous = $_GET["param2"];
+                
+            }
+            $param3 =  (isset($_GET['param3'])) ?  $_GET['param3'] : "0";
+             
+            
        
             
         }
         ($note->get_type() == "TextNote" ? new View("open_text_note") : new View("open_checklist_note"))->show([
             "note" => $note, "note_id" => $note_id, "get_time" => $this->get_time($note_id), "edited" => $this->get_edited_time($note_id),
              "archived" => $archived, "isShared_as_editor" => $isShared_as_editor, "isShared_as_reader" => $isShared_as_reader, "note_body" => $body,
-             "pinned" => $pinned, "user_id" => $user_id, "as_editor" => $as_editor
+             "pinned" => $pinned, "user_id" => $user_id, "as_editor" => $as_editor, "back" => $previous, "param3" => $param3
         ]);
     }
 
@@ -121,7 +128,7 @@ class ControllerOpen_note extends Controller
             $note_id = $_GET["param1"];
             $note = Note::get_note_by_id($note_id);
             $note->archive();
-            $this->redirect("open_note", "index", $note_id);
+            $this->redirect("open_note", "index", $note_id, "back_archives");
         }
     }
 
@@ -131,7 +138,7 @@ class ControllerOpen_note extends Controller
             $note_id = $_GET["param1"];
             $note = Note::get_note_by_id($note_id);
             $note->unarchive();
-            $this->redirect();
+            $this->redirect("open_note", "index", $note_id, "back_my_notes","0");
         }
     }
 

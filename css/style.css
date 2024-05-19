@@ -139,13 +139,11 @@ input:focus {
   list-style-type: none;
 }
 
-.main_login_signup form .cancel input {
-  background-color: #202325;
-  /*#23252a;/*#1e272e;*/
-  border: 1px solid red;
-  color: red;
+.main_login_signup form .cancel a {
+
   font-size: 18px;
   font-weight: 300;
+  width: 100%;
 
 }
 
@@ -1013,4 +1011,44 @@ input:focus, textarea:focus {
   top : 170px;
 }
 
+/*confirm delete note*/
+.container_delete_note {
+  max-width: 400px;
+  padding: 0 20px;
+  margin: 170px auto;
+}
 
+
+.main_delete_note {
+  width: 100%;
+  height: 400px;
+  border-radius: 10px;
+  border: 1.5px solid #48505f;
+}
+
+ 
+.main_delete_note .title{
+
+  color: red;
+  height: 150px;
+  border-bottom: 1.5px solid #48505f;
+  font-size: 25px;
+  font-weight: 400;
+  text-align: center;
+  margin: 20px;
+
+}
+.main_delete_note .title span {
+  color : red;
+  font-size: 80px;
+  
+}
+.txt_confirm_delete {
+  margin: 20px;
+  text-align: center;
+  font-weight: 350;
+}
+.btn_confirm_delete {
+  margin: 20px;
+  text-align: center;
+}
