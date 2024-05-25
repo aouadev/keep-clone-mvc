@@ -17,6 +17,8 @@ class ControllerOpen_note extends Controller
             $isShared_as_reader = $note->isShared_as_reader($user_id);
             $as_editor = $note->as_editor($user_id);
             $body = $note->get_content();
+            $previous = "";
+            $param3 = "";
             if (isset($_GET["param2"])) {
                 $previous = $_GET["param2"];
                 

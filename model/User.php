@@ -253,5 +253,11 @@ class User extends Model
         return $error;
         
     }
+    public function get_all_labels() : array {
+        $data = [];
+        $query = self::execute("select distinct label from note_labels join notes on note_labels.note = notes.id where notes.owner = :user_id", ["user_id"=>$this->id]);
+        $data = $query->fetchAll();
+        return $data;
+    }
 }
 

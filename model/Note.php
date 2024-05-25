@@ -427,6 +427,14 @@ abstract class Note extends Model
         $data = $query->fetch();
         return $data['max_weight'];
     }
+
+    public function list_labels() : array{
+        $data = [];
+        $query = self::execute("select * from note_labels where note = :id", ["id" => $this->note_id]);
+        $data = $query->fetchAll();
+    
+        return $data;
+    }
  
 
     

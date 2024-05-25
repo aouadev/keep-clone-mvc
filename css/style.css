@@ -541,6 +541,7 @@ nav a {
   top: 30px;
 
 
+
 }
 
 #delete_icon {
@@ -560,9 +561,10 @@ nav a {
   right: 0;
 }
 
+
 .archive {
   position: absolute;
-  right: 40px;
+  right: 80px;
 }
 
 .isShared {
@@ -572,12 +574,16 @@ nav a {
 
 .pinned {
   position: absolute;
-  right: 80px;
+  right: 120px;
 }
 
 .share {
   position: absolute;
-  right: 120px;
+  right: 160px;
+}
+.labels {
+  position: absolute;
+  right:40px ;
 }
 
 /* Partie title et dates */
@@ -933,7 +939,7 @@ input:focus, textarea:focus {
   width: 100%;
   
 }
-.btn-plus {
+.btn-plus, .btn-delete-label{
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   width: 50px;
@@ -1052,3 +1058,31 @@ input:focus, textarea:focus {
   margin: 20px;
   text-align: center;
 }
+.add_label {
+  display : inline-flex;
+  width: 100%;
+}
+.label_txt {
+  background: transparent;
+  width: 100%;
+  border: 1px solid gray;
+  border-right: none;
+
+  padding-left: 10px;
+}
+.label_title {
+  color: lightgray;
+}
+.label_content {
+  
+  border : 1px solid grey;
+  border-radius: 5px 0 0 5px;
+  border-right: none;
+  width: 100%;
+  color : lightgray;
+}
+input .label_txt ::placeholder {
+  font-style:italic;
+
+}
+

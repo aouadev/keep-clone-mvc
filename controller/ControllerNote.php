@@ -296,12 +296,13 @@ class ControllerNote extends Controller
             $aray_users= $note->list_share_users();
          
             $list_share = $note->share_list();
+            $url_back_page = "open_note/index/$note_id";
             
             
             
         
          
-            (new view('shares'))->show(["users" => $aray_users, "list" => $list_share, "note_id" => $note_id]); 
+            (new view('shares'))->show(["users" => $aray_users, "list" => $list_share, "note_id" => $note_id, "url_back_page" => $url_back_page]); 
         }  
         
     }
@@ -318,6 +319,21 @@ class ControllerNote extends Controller
             }
             $this->redirect("note", "open_shares/$note_id");
         }
+    }
+
+    public function open_labels()  {
+        if (isset($_GET['param1']) && isset($_GET['param1']) !=="") {
+            $note_id = $_GET['param1'];
+            $note = Note::get_note_by_id($note_id);
+            $url_back_page = "open_note/index/$note_id";
+            $array_labels = $note->list_labels();
+            $user = User::get_user_by_id($note->owner);
+            $array_all_labels = $user->get_all_labels();
+            
+      
+        }
+        (new view('labels'))->show(["url_back_page" => $url_back_page, "labels" => $array_labels, "all_labels"=> $array_all_labels]);
+        
     }
     public function editor_and_delete_btn() {
         if(isset($_GET['param1']) && isset($_GET['param1']) !=="" 
