@@ -435,6 +435,13 @@ abstract class Note extends Model
     
         return $data;
     }
+    public function delete_label($note_id, $label){
+        self::execute("delete from note_labels where note = :id and label = :label", ['id'=>$note_id, 'label'=>$label]);
+    }
+    public function add_label($note_id, $label) {
+        var_dump($label);
+        self::execute("INSERT into note_labels(note, label) VALUES (:id, :label)", ['id' => $note_id, 'label' =>$label]);
+    }
  
 
     

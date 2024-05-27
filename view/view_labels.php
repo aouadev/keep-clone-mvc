@@ -32,31 +32,32 @@
                 <?php foreach ($labels as $row): ?>
                     <?php $i =$row['note'] ?>
                     <form action="note/delete_label/<?=$i?>/<?=$i?>" method="post">
-                <div class="share-item mb-2">
+                    <div class="share-item mb-2">
 
                         <div class="label_content p-2"><?= $row['label'] ?></div>
                       
-                        <button name="delete"class="btn btn-danger btn-delete-label " type="submit">-</button>
+                        <button name="delete"class="btn btn-danger btn-delete-label" value="<?=$row['label']?>" type="submit">-</button>
                   
-                </div>
+                    </div>
                     </form>
                 <?php endforeach; ?>
                 
             <?php endif; ?>
         </div>
         <form action="note/add_label/<?=$note_id?>" method = "post">
-        <label class="label_title">Add a new Label</label>
-        <div class="add_label">
-            <input list="labels_list" type="text" class="label_txt" name="label" placeholder="Type to search or create...">
-            <datalist id="labels_list" >
+            <label class="label_title">Add a new Label</label>
+            <div class="add_label">
+                <input list="labels_list" type="text" class="label_txt" name="label"  placeholder="Type to search or create...">
+                <datalist  id="labels_list" >
                 <?php foreach ($all_labels as $label): ?>
                     <option value="<?=$label['label']?>"></option>
                     <?php endforeach; ?>
-            </datalist>
-            <div class="col-btn ">
-                <input class="btn btn-primary btn-plus" type="submit" value="+">
+                </datalist>
+                <div class="col-btn ">
+                    <input class="btn btn-primary btn-plus" value="+" type="submit">
+                </div>
             </div>
-        </div>
+        </form>
       
           
          

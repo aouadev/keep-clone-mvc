@@ -353,6 +353,31 @@ class ControllerNote extends Controller
 
         }
     }
+    public function delete_label()  {
+      
+        if (isset($_POST['delete']) && isset($_GET['param1'])) {
+            $note_id = $_GET['param1'];
+            $note = Note::get_note_by_id($note_id);
+            $label = $_POST['delete'];
+            $note->delete_label($note_id, $label);
+            $this->redirect("note", "open_labels/$note_id");
+        }
+        
+    }
+    public function add_label(){
+        echo"add label";
+        var_dump($_POST['label']);
+        if (isset($_POST['label']) && isset($_GET['param1']) && isset($_POST['label']) != "") {
+            $note_id = $_GET['param1'];
+            $note = Note::get_note_by_id($note_id);
+            $label = $_POST['label'];
+            var_dump($label);
+            $note->add_label($note_id, $label);
+           // $this->redirect("note", "open_labels/$note_id");
+
+        }
+        
+    }
 
     
     
