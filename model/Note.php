@@ -104,25 +104,22 @@ abstract class Note extends Model
     }
     public function archive(): void
     {
-        $max = $this->max_notes_archived();
-        self::execute("UPDATE notes SET archived = :val, weight = :weight WHERE id = :id ", ["val" => 1, "id" => $this->note_id, "weight" => $max + 1]);
+        self::execute("UPDATE notes SET archived = :val  WHERE id = :id ", ["val" => 1, "id" => $this->note_id]);
         $this->unpin();
     }
 
     public function unarchive(): void
     {
-        $max = $this->max_notes_unpinned();
-        self::execute("UPDATE notes SET archived = :val, weight = :weight  WHERE id = :id", ["val" => 0, "id" => $this->note_id, "weight" => $max + 1]);
+     self::execute("UPDATE notes SET archived = :val  WHERE id = :id", ["val" => 0, "id" => $this->note_id]);
     }
     public function pin(): void
     {
-        $max = $this->max_notes_pinned();
-        self::execute("UPDATE notes SET pinned = :val, weight = :weight WHERE id = :id", ["val" => 1,"weight" => $max + 1, "id" => $this->note_id]);
+        self::execute("UPDATE notes SET pinned = :val  WHERE id = :id", ["val" => 1,"id" => $this->note_id]);
     }
     public function unpin(): void
     {
-        $max = $this->max_notes_unpinned();
-        self::execute("UPDATE notes SET pinned = :val, weight = :weight WHERE id = :id", ["val" => 0, "weight" => $max + 1, "id" => $this->note_id]);
+       
+        self::execute("UPDATE notes SET pinned = :val  WHERE id = :id", ["val" => 0, "id" => $this->note_id]);
     }
 
 
@@ -226,20 +223,25 @@ abstract class Note extends Model
         return false;
     }
 
-    public function validate(): array
+    public function validate_title($title): array
     {
         $errors = [];
 
         $minLength = Configuration::get('title_min_length');
         $maxLength = Configuration::get('title_max_length');
-        if (strlen($this->title) < $minLength || strlen($this->title) > $maxLength) {
-            $errors[] = "Le titre doit contenir entre $minLength et $maxLength caractères.";
+  
+        $errors = [];
+        if (!strlen($title) > 0) {
+            $errors[] = "⚠ is required.";
         }
-
-
+        if (strlen($title) < $minLength) 
+            $errors[] =  "⚠must have mutch than 3 char";
+        elseif(strlen($title) > $maxLength) {
+            $errors[] = "⚠must have min than 25 char";
+        }
         return $errors;
     }
-    public function validate_title()
+ /*   public function validate_title()
     {
         $errors = [];
         $minLength = Configuration::get('title_min_length');
@@ -261,7 +263,7 @@ abstract class Note extends Model
         }
 
         return $errors;
-    }
+    }*/
 
     public function validate_content()
     {
@@ -279,27 +281,12 @@ abstract class Note extends Model
 
 
 
-    public function persist(): Note|array {  
-         $errors = [];
-         if ($this->note_id == null) {
-           
-            $errors = $this->validate();
-            if (empty($errors)) {
-                $this->insert();
-                return $this;
-            }
-            else 
-                return $errors;
-        } else {
-            $errors = $this->validate();
-            if (empty($errors)) {
-                $this->update_note();
-                return $this;
-            }
-          
-        
-            return $errors;
-        }
+    public function persist(): Note {  
+        if ($this->note_id == null) 
+            $this->insert();
+        else 
+            $this->update_note();
+        return $this;
     }
 
     public function is_weight_unique(int $id): int
@@ -473,17 +460,37 @@ abstract class Note extends Model
 
     public function list_labels() : array{
         $data = [];
-        $query = self::execute("select * from note_labels where note = :id", ["id" => $this->note_id]);
+        $query = self::execute("select distinct * from note_labels where note = :id", ["id" => $this->note_id]);
         $data = $query->fetchAll();
     
         return $data;
     }
+  
     public function delete_label($note_id, $label){
         self::execute("delete from note_labels where note = :id and label = :label", ['id'=>$note_id, 'label'=>$label]);
     }
     public function add_label($note_id, $label) {
         var_dump($label);
         self::execute("INSERT into note_labels(note, label) VALUES (:id, :label)", ['id' => $note_id, 'label' =>$label]);
+    }
+    
+    public function validate_label(string $label) {
+        $errors = [];
+        $minLength = Configuration::get('label_min_length');
+        $maxLength = Configuration::get('label_max_length');
+        if (!strlen($label) > 0) {
+            $errors[] = "⚠ is required.";
+        }
+        if (strlen($label) < $minLength || strlen($label) > $maxLength)
+            $errors[] =  "⚠ Label length must be between 2 and 10";
+        if ($this->same_label($label)) 
+            $errors[] = "⚠ A note cannot contain the same label Twice";
+        return $errors;
+    }
+
+    private function same_label($label) {
+        $query = self::execute("select label from note_labels where note = :id and label = :label", ["id" => $this->note_id, "label"=>$label]);
+        return $query->fetch();
     }
  
 

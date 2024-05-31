@@ -142,11 +142,12 @@ class User extends Model
 
     public function validate_name(string $name): array
     {
+        $minLength = Configuration::get('full_name_min_length');
         $errors = [];
         if (!strlen($name) > 0) {
             $errors[] = "⚠ is required.";
         }
-        if (!(strlen($name) >= 3)) {
+        if (!(strlen($name) >= $minLength)) {
             $errors[] = "⚠must have mutch than 3 char";
         }
         return $errors;
@@ -255,9 +256,25 @@ class User extends Model
     }
     public function get_all_labels() : array {
         $data = [];
-        $query = self::execute("select distinct label from note_labels join notes on note_labels.note = notes.id where notes.owner = :user_id", ["user_id"=>$this->id]);
+        $query = self::execute("select distinct label from notes join note_labels 
+        on note_labels.note = notes.id where notes.owner = :user_id " , ["user_id"=>$this->id]);
         $data = $query->fetchAll();
         return $data;
+    }
+    public function other_labels($note_id) :array {
+        $data = [];
+        $query = self::execute("SELECT DISTINCT label FROM notes
+                                JOIN note_labels ON note_labels.note = notes.id WHERE notes.owner = :user_id
+                                AND label NOT IN (SELECT label FROM note_labels 
+                                WHERE note_labels.note = :note_id )", ["user_id"=>$this->id, "note_id" => $note_id]);
+        $data = $query->fetchAll();
+        return $data;
+    
+    }
+    public function get_all_my_labels() {
+        $query = self::execute("SELECT id, label FROM notes JOIN note_labels ON 
+                                note_labels.note = notes.id WHERE owner = :owner", ["owner" => $this->id]);
+         return $query->fetchAll();                       
     }
 }
 

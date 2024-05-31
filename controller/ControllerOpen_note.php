@@ -187,7 +187,7 @@ class ControllerOpen_note extends Controller
                 $title = Tools::sanitize($_POST["title"]);
                 $note = Note::get_note_by_id($note_id);
                 $note->title = $title;
-                $errors = $note->validate_title();
+                $errors = $note->validate_title($title);
             }
 
 

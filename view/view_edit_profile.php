@@ -38,7 +38,9 @@
                     <input type="submit" value="Save Change">
                 </div>
                 <div class="inputbox button cancel" >
-                    <input type="button" value="Cancel" onclick="window.location.href='settings/settings';">
+                <a href="settings/settings" type="button" class="btn btn-outline-danger">Cancel</a>
+               <!-- <input type="button" value="Cancel" onclick="window.location.href='settings/settings';"> -->
+            </div> 
                 </div>
             </form>
         </div>

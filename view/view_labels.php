@@ -22,6 +22,7 @@
         </div>
         
         <p class="view-share-title"> Labels :</p>
+    
         <div class="view-share-items">
         <div class="share-list mb-2">
             <?php if(count($labels) == 0): ?>
@@ -31,7 +32,7 @@
                  
                 <?php foreach ($labels as $row): ?>
                     <?php $i =$row['note'] ?>
-                    <form action="note/delete_label/<?=$i?>/<?=$i?>" method="post">
+                    <form action="note/open_labels/<?=$i?>/<?=$i?>" method="post">
                     <div class="share-item mb-2">
 
                         <div class="label_content p-2"><?= $row['label'] ?></div>
@@ -44,24 +45,43 @@
                 
             <?php endif; ?>
         </div>
-        <form action="note/add_label/<?=$note_id?>" method = "post">
+        <form action="note/open_labels/<?=$note_id?>" method = "post">
             <label class="label_title">Add a new Label</label>
             <div class="add_label">
-                <input list="labels_list" type="text" class="label_txt" name="label"  placeholder="Type to search or create...">
+                <input list="labels_list" type="text" class="label_txt" name="label" autocomplete="off" value="<?=$label?>" placeholder="Type to search or create...">
+               
                 <datalist  id="labels_list" >
-                <?php foreach ($all_labels as $label): ?>
-                    <option value="<?=$label['label']?>"></option>
+               
+                <?php foreach ($other_labels as $label): ?>
+                    
+                
+                        <option value="<?=$label['label']?>"></option>
+                    
                     <?php endforeach; ?>
                 </datalist>
                 <div class="col-btn ">
                     <input class="btn btn-primary btn-plus" value="+" type="submit">
                 </div>
             </div>
+            
+            <?php if (count($errors) != 0): ?>
+                <div class="errors">
+                    <ul>
+                        <?php foreach ($errors as $error): ?>
+                            <li><?= $error ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                </div>
+            <?php endif; ?>
         </form>
+    
       
           
          
   
 </div>
+
+        
+        
 </body>
 </html>

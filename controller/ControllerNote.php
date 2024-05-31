@@ -12,8 +12,15 @@ class ControllerNote extends Controller
         $user = $this->get_user_or_redirect();
         $notes_pinned = $user->get_notes_pinned();
         $notes_unpinned = $user->get_notes_unpinned();
-        $_SESSION['previous_page'] = $_SERVER['REQUEST_URI'];
-        (new View("notes"))->show(["currentPage" => "my_notes", "notes_pinned" => $notes_pinned, "notes_unpinned" => $notes_unpinned,  "user" => $user, "sharers" => $user->shared_by()]);
+        $my_labels = $user->get_all_my_labels();
+   
+       
+        (new View("notes"))->show(["currentPage" => "my_notes", 
+                                    "notes_pinned" => $notes_pinned, 
+                                    "notes_unpinned" => $notes_unpinned, 
+                                     "user" => $user,
+                                      "sharers" => $user->shared_by(),
+                                    "my_labels" => $my_labels]);
     }
 
     public function move_up(): void
@@ -65,7 +72,7 @@ class ControllerNote extends Controller
             $user = $this->get_user_or_redirect();
             $title = $_POST['title'];
             $content = $_POST['content'];
-            $errors = $user->validate_name($title); // l'utilisation de la même méthode de validation du nom de l'utilisateur
+            $errors = $user->validate_name($title); 
             if($id == 0) {
                 $errors = array_merge($errors, $user->validate_title_note($title));
                 $note = new TextNote($title, $user->id, Date("Y-m-d H:i:s"));
@@ -73,7 +80,7 @@ class ControllerNote extends Controller
                 $note->set_weight($weight+1);
                 $note->set_content($content);
             } else {
-              
+                $errors = array_merge($errors, $user->validate_title_note($title));
                 $note->title = $title;
                 $note->set_content($content);
             }
@@ -139,7 +146,7 @@ class ControllerNote extends Controller
                 false,
                 0
             );
-            $errors = $note->validate_title();
+            $errors = $note->validate_title($title);
 
 
             foreach ($non_empty_items as $key => $item) {
@@ -217,7 +224,7 @@ class ControllerNote extends Controller
             if (isset($_POST["title"]) && $_POST["title"] != "") {
                 $title = Tools::sanitize($_POST["title"]);
                 $note = Note::get_note_by_id($id);
-                $errors = $note->validate();
+                $errors = $note->validate_title($title);
                 if (empty($errors)) {
 
                     $note->title = $title;
@@ -244,50 +251,6 @@ class ControllerNote extends Controller
         }
     }
 
-    public function save_edit_text_note() {
-        $user = $this->get_user_or_redirect();
-        $errors = []; 
-        // Vérifiez si les données POST sont présentes
-        if (isset($_GET['param1'], $_POST['title'], $_POST['content'])) {
-            $note_id = (int)$_GET['param1'];
-            if ($note_id > 0) {
-                $note = TextNote::get_note_by_id($note_id);
-    
-                // Vérifiez si la note existe et si l'utilisateur est le propriétaire
-                if ($note && $note->owner == $user->id) {
-                    // Sanitize input
-                    $note->title = Tools::sanitize($_POST['title']);
-                    $note->set_content(Tools::sanitize($_POST['content']));
-    
-                    // Valider le titre et contenu
-                    $_SESSION['edit_errors'] = []; // Réinitialiser les erreurs de session avant la validation
-                    $titleErrors = $note->validate_title();
-                    $contentErrors = $note->validate_content();
-                    $errors = array_merge($titleErrors, $contentErrors);
-                    
-                    if (!empty($errors)) {
-                        // Stocker l'erreur de titre dans la session
-                        $_SESSION['edit_errors'] = $errors;
-                        $this->redirect("openNote", "edit", $note_id);
-                        exit();
-                    }
-    
-                    // Si tout est correct, mettre à jour la note
-                    $note->update();
-    
-                    // Redirection vers la vue de la note
-                    $this->redirect("openNote", "index", $note_id);
-                    exit();
-                } else {
-                    echo "Note introuvable ou vous n'avez pas la permission de la modifier.";
-                }
-            } else {
-                echo "ID de note invalide.";
-            }
-        } else {
-            echo "Les informations requises sont manquantes.";
-        }
-    }
 
 
 
@@ -300,11 +263,6 @@ class ControllerNote extends Controller
          
             $list_share = $note->share_list();
             $url_back_page = "open_note/index/$note_id";
-            
-            
-            
-        
-         
             (new view('shares'))->show(["users" => $aray_users, "list" => $list_share, "note_id" => $note_id, "url_back_page" => $url_back_page]); 
         }  
         
@@ -326,18 +284,35 @@ class ControllerNote extends Controller
 
     public function open_labels()  {
         if (isset($_GET['param1']) && isset($_GET['param1']) !=="") {
+            $label = '';
             $note_id = $_GET['param1'];
             $note = Note::get_note_by_id($note_id);
             $url_back_page = "open_note/index/$note_id";
             $array_labels = $note->list_labels();
             $user = User::get_user_by_id($note->owner);
             $array_all_labels = $user->get_all_labels();
-            
-      
-        }
-        (new view('labels'))->show(["url_back_page" => $url_back_page, "labels" => $array_labels, "all_labels"=> $array_all_labels]);
+            $other_labels = $user->other_labels($note_id);
+            $errors = [];
+            if (isset($_POST['delete'])) {
+                $label = $_POST['delete'];
+                $note->delete_label($note_id, $label);
+                $this->redirect("note", "open_labels/$note_id");
+            }
+            if (isset($_POST['label']) && isset($_POST['label']) != "") {
+                $label = $_POST['label'];
+                $errors = $note->validate_label($label);
+                if(count($errors) == 0) {
+                    $note->add_label($note_id, $label);
+                    $this->redirect("note", "open_labels/$note_id");
+                }
+               
+    }
+        (new view('labels'))->show(["url_back_page" => $url_back_page, 
+        "labels" => $array_labels, "all_labels"=> $array_all_labels,'note_id'=>$note_id,
+         "other_labels"=>$other_labels, "errors"=>$errors, "label"=>$label]);
         
     }
+}
     public function editor_and_delete_btn() {
         if(isset($_GET['param1']) && isset($_GET['param1']) !=="" 
         && isset($_GET['param2']) && isset($_GET['param1']) !=="") {
@@ -352,8 +327,6 @@ class ControllerNote extends Controller
                 $note->delete_from_share($user_id);
             }
             $this->redirect("note", "open_shares/$note_id");
-
-
         }
     }
     public function delete_label()  {
@@ -368,15 +341,17 @@ class ControllerNote extends Controller
         
     }
     public function add_label(){
-        echo"add label";
-        var_dump($_POST['label']);
         if (isset($_POST['label']) && isset($_GET['param1']) && isset($_POST['label']) != "") {
             $note_id = $_GET['param1'];
             $note = Note::get_note_by_id($note_id);
             $label = $_POST['label'];
-            var_dump($label);
-            $note->add_label($note_id, $label);
-           // $this->redirect("note", "open_labels/$note_id");
+            $errors[] = $note->validate_label($label);
+            if(count($errors) == 0) {
+                $note->add_label($note_id, $label);
+                
+            }
+            $this->redirect("note", "open_labels/$note_id");
+         
 
         }
         
