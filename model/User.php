@@ -35,7 +35,18 @@ class User extends Model
             return new User($data["mail"], $data["hashed_password"], $data["full_name"], $data["role"], $data["id"]);
         }
     }
-
+    public static function get_user_by_name(string $user_name): User|false
+    {   $data = [];
+        $query = self::execute("SELECT * FROM Users where full_name = :name", ["name" => trim($user_name)]);
+        var_dump(trim($user_name));
+        $data = $query->fetch();
+        var_dump($data); // tableau vide !
+        if ($query->rowCount() == 0) {
+            return false;
+        } else {
+            return new User($data["mail"], $data["hashed_password"], $data["full_name"], $data["role"], $data["id"]);
+        }
+    }
 
 
     public function persist(): User
@@ -71,52 +82,18 @@ class User extends Model
     }
 
 
-    public function validate(): array
-    {
-
+    public function validate($mail): array {
         $errors = [];
-        if (!strlen($this->mail) > 0) {
+        if (!strlen($mail) > 0) {
             $errors[] = "⚠Mail is requiered.";
         }
-        if (!(preg_match("/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/", $this->mail))) {
+        if (!(preg_match("/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/", $mail))) {
             $errors[] = "⚠Email must have a valid structure.";
         }
         return $errors;
     }
 
-    public static function validateEdit($email, $fullname,$currentUser): array
-{
-    $errors = [];
-    if (!strlen($email) > 0) {
-        $errors[] = "⚠Mail is required.";
-    }
-    if (!(preg_match("/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/", $email))) {
-        $errors[] = "⚠Email must have a valid structure.";
-    }
-    if (!strlen($fullname) > 0) {
-        $errors[] = "⚠Full Name is required.";
-    }
-    if (!(strlen($fullname) >= 3)) {
-        $errors[] = "⚠Full Name must have more than 3 characters.";
-    }
-
-    $currentUserId = $currentUser ? $currentUser->id : null;
-
-    // Vérifier l'unicité de l'email uniquement si l'email est modifié par rapport à celui de l'utilisateur actuel
-    if ($currentUser && $currentUser->mail === $email) {
-        $errors[] = "⚠The email entered is identical to the current email.";
-    } else {
-        $existingUser = User::get_user_by_mail($email);
-        if ($existingUser && $existingUser->id != $currentUserId) {
-            $errors[] = "⚠This email is already used by another user.";
-        }
-    }
-
-    return $errors;
-}
-
-    private static function check_password($clear_password, string $hash): bool
-    {
+    private static function check_password($clear_password, string $hash): bool {
         return $hash === Tools::my_hash($clear_password);
     }
 
@@ -133,7 +110,7 @@ class User extends Model
         }
         return $errors;
     }
-    private static function validate_password(string $password, $currentUser): array
+    private static function validate_password(string $password): array
     {
         $errors = [];
         if (strlen($password) < 8) {
@@ -143,10 +120,6 @@ class User extends Model
             $errors[] = "⚠Password must contain one uppercase letter, one number and punctuation mark.";
         }
 
-        // Récupérer le mot de passe actuel de l'utilisateur
-    if ($currentUser && Tools::my_hash($password) === $currentUser->getHashedPassword()) {
-        $errors[] = "⚠The new password cannot be the same as the current password.";
-    }
         return $errors;
     }
     public static function validate_passwords(string $password, string $password_confirm, $currentPassword): array
@@ -157,7 +130,7 @@ class User extends Model
         }
         return $errors;
     }
-    public static function validate_unicity(string $mail): array
+    public function validate_unicity(string $mail): array
     {
         $errors = [];
         $user = self::get_user_by_mail($mail);
@@ -167,14 +140,15 @@ class User extends Model
         return $errors;
     }
 
-    public function validate_name(): array
+    public function validate_name(string $name): array
     {
+        $minLength = Configuration::get('full_name_min_length');
         $errors = [];
-        if (!strlen($this->full_name) > 0) {
-            $errors[] = "⚠Full Name is required.";
+        if (!strlen($name) > 0) {
+            $errors[] = "⚠ is required.";
         }
-        if (!(strlen($this->full_name) >= 3)) {
-            $errors[] = "⚠Full Name must have mutch than 3 char";
+        if (!(strlen($name) >= $minLength)) {
+            $errors[] = "⚠must have mutch than 3 char";
         }
         return $errors;
     }
@@ -259,6 +233,48 @@ class User extends Model
         } catch (PDOException $e) {
             throw new Exception("Erreur lors de la mise à jour du mot de passe : " . $e->getMessage());
         }
+    }
+    public function get_users2() : array{
+        $query = self::execute("SELECT * FROM Users", []);
+        return $query->fetchAll();
+        
+    }
+    
+    public function edit_profile(string $mail, string $name): void{
+        self::execute("UPDATE users SET mail =:mail, full_name = :name WHERE id = :id ", ["mail" => $mail, "name"=>$name, "id" => $this->id]);    
+    }
+
+    public function validate_title_note($title){
+        $error = [];
+        $query = self::execute("select title from notes where owner = :user_id and title = :title", ['user_id'=>$this->id, 'title'=>$title]);
+        $data = $query->fetchAll();
+        if (count($data) != 0) {
+            $error[] = "⚠already exists";
+        }
+        return $error;
+        
+    }
+    public function get_all_labels() : array {
+        $data = [];
+        $query = self::execute("select distinct label from notes join note_labels 
+        on note_labels.note = notes.id where notes.owner = :user_id " , ["user_id"=>$this->id]);
+        $data = $query->fetchAll();
+        return $data;
+    }
+    public function other_labels($note_id) :array {
+        $data = [];
+        $query = self::execute("SELECT DISTINCT label FROM notes
+                                JOIN note_labels ON note_labels.note = notes.id WHERE notes.owner = :user_id
+                                AND label NOT IN (SELECT label FROM note_labels 
+                                WHERE note_labels.note = :note_id )", ["user_id"=>$this->id, "note_id" => $note_id]);
+        $data = $query->fetchAll();
+        return $data;
+    
+    }
+    public function get_all_my_labels() {
+        $query = self::execute("SELECT id, label FROM notes JOIN note_labels ON 
+                                note_labels.note = notes.id WHERE owner = :owner", ["owner" => $this->id]);
+         return $query->fetchAll();                       
     }
 }
 

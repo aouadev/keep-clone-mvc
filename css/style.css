@@ -1,6 +1,5 @@
-body,
-html {
-  height: 100%;
+body{
+
   margin: 0;
   padding: 0;
   background-color: #202325;
@@ -17,14 +16,17 @@ html {
 
 .main_login_signup {
   width: 100%;
-  height: 370px;
+  min-height: 370px;
   border-radius: 10px;
   border: 1.5px solid #48505f;
 }
 
 .signup {
-  height: 470px;
+  min-height: 470px;
 
+}
+.edit_profile {
+  min-height: 400px;
 }
 
 .main_login_signup .title {
@@ -136,13 +138,11 @@ input:focus {
   list-style-type: none;
 }
 
-.main_login_signup form .cancel input {
-  background-color: #202325;
-  /*#23252a;/*#1e272e;*/
-  border: 1px solid red;
-  color: red;
+.main_login_signup form .cancel a {
+
   font-size: 18px;
   font-weight: 300;
+  width: 100%;
 
 }
 
@@ -212,6 +212,8 @@ h2 {
   width: 188px;
   background: #202325;
   margin: 3px;
+  min-height: 230px;
+  position: relative;
 }
 
 .link-note-archivee,
@@ -234,6 +236,12 @@ h2 {
   padding: 20px;
   font-weight: 350;
   font-size: 15px;
+  position: relative;
+  bottom: 30px;
+  top: 0;
+  
+  
+  
 }
 
 .content_text {
@@ -351,7 +359,10 @@ h2 {
   background: #202325;
   margin: 3px;
   position: relative;
+  min-height: 230px;
+  
 }
+
 
 /* share note*/
 
@@ -520,19 +531,7 @@ nav a {
   margin: 2em;
 }
 
-/* edit_profile */
 
-.edit_form {
-  position: absolute;
-  top: 120px;
-  left: 300px;
-}
-
-.form-label {
-  color: white;
-  font-size: 15px;
-  font-weight: 300;
-}
 
 /* logout */
 
@@ -550,6 +549,7 @@ nav a {
   left: 3%;
   width: 94%;
   top: 30px;
+
 
 
 }
@@ -571,9 +571,10 @@ nav a {
   right: 0;
 }
 
+
 .archive {
   position: absolute;
-  right: 40px;
+  right: 80px;
 }
 
 .isShared {
@@ -583,12 +584,16 @@ nav a {
 
 .pinned {
   position: absolute;
-  right: 80px;
+  right: 120px;
 }
 
 .share {
   position: absolute;
-  right: 120px;
+  right: 160px;
+}
+.labels {
+  position: absolute;
+  right:40px ;
 }
 
 /* Partie title et dates */
@@ -639,6 +644,7 @@ nav a {
 .note_body_text {
     color : lightgray;
     position: absolute;
+    
     top: 230px;
     left: 3%;
     padding: 15px;
@@ -649,6 +655,9 @@ nav a {
     overflow-y: auto;
     max-height: 500px;
     
+}
+.add_text_note {
+  background-color: transparent;
 }
 
 /*error edit and add text_note*/
@@ -934,5 +943,174 @@ input:focus, textarea:focus {
 .modal-content {
   background-color: #313538;
 }
+/*view-share*/ 
+
+.dropdown-view-share {
+  display:inline-flex;
+  width: 100%;
+  
+}
+.btn-plus, .btn-delete-label{
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  width: 50px;
+}
+.view-share-title {
+  font-size: 15px;
+  font-weight: 500;
+}
+.col-users {
+  
+  
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-right: none;
+  width:100%;
+}
+.col-permission {
+  width: 100%;
+}
+.select-permission {
+ 
+  border: 1px solid grey;
+  border-right: none;
+}
+.form-select {
+  color:white;
+  background-color: transparent;
+  border-radius: 0;
+ 
+}
+.dropdown-item {
+  background-color:  #202325; ;
+    color: white;
+}
+
+.select-user {
+  border-bottom-left-radius: 5px;
+  border-top-left-radius: 5px;
+  border: 1px solid grey;
+  border-right: none;
+}
+
+.share-item {
+ display: inline-flex; 
+
+  width: 100%;
+}
+.share-name {
+  
+  border : 1px solid grey;
+  border-radius: 5px 0 0 5px;
+  border-right: none;
+  width: 100%;
+}
+.btn-delete {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.btn-recycle {
+  border-radius: 0%;
+  color : white;
+  font-size: 10;
+}
+.view-share-items {
+  
+  width: 90%;
+}
+.not_shared {
+  font-style: italic;
+  color: lightgray;
+  font-weight: 350;
+}
+.error_add_note_php {
+  position: absolute;
+  top : 170px;
+}
+
+/*confirm delete note*/
+.container_delete_note {
+  max-width: 400px;
+  padding: 0 20px;
+  margin: 170px auto;
+}
 
 
+.main_delete_note {
+  width: 100%;
+  height: 400px;
+  border-radius: 10px;
+  border: 1.5px solid #48505f;
+}
+
+ 
+.main_delete_note .title{
+
+  color: red;
+  height: 150px;
+  border-bottom: 1.5px solid #48505f;
+  font-size: 25px;
+  font-weight: 400;
+  text-align: center;
+  margin: 20px;
+
+}
+.main_delete_note .title span {
+  color : red;
+  font-size: 80px;
+  
+}
+.txt_confirm_delete {
+  margin: 20px;
+  text-align: center;
+  font-weight: 350;
+}
+.btn_confirm_delete {
+  margin: 20px;
+  text-align: center;
+}
+.add_label {
+  display : inline-flex;
+  width: 100%;
+}
+.label_txt {
+  background: transparent;
+  width: 100%;
+  border: 1px solid gray;
+  border-right: none;
+
+  padding-left: 10px;
+}
+.label_title {
+  color: lightgray;
+}
+.label_content {
+  
+  border : 1px solid grey;
+  border-radius: 5px 0 0 5px;
+  border-right: none;
+  width: 100%;
+  color : lightgray;
+}
+
+
+form .add_label input {
+  color: white;
+} 
+.my_labels {
+  position: absolute;
+  bottom: 0px;
+  display: flex;
+  padding: 5px;
+  flex-wrap: wrap;
+  
+ 
+}
+.label {
+  padding: 0 5px 0 5px ;
+  background-color: gray;
+  border-radius: 20px;
+  margin: 3px;
+  font-weight: 550;
+  font-size: 13px;
+}
