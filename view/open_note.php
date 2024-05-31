@@ -31,7 +31,7 @@
             <?php endif; ?>
             <a class="archive" href="open_note/archive/<?= $note_id ?>"><span class="material-symbols-outlined">archive</span></a>
             <a class="labels" href="note/open_labels/<?=$note_id?>"><span class="material-symbols-outlined">label</span></a>
-            <a class="isShared" href="open_note/edit/<?= $note_id ?>"><span class="material-symbols-outlined">edit</span></a>
+            <a class="isShared" href="note/edit_text_note/<?= $note_id ?>"><span class="material-symbols-outlined">edit</span></a>
         <?php endif; ?>
 
 </div>

@@ -104,20 +104,25 @@ abstract class Note extends Model
     }
     public function archive(): void
     {
-        self::execute("UPDATE notes SET archived = :val WHERE id = :id", ["val" => 1, "id" => $this->note_id]);
+        $max = $this->max_notes_archived();
+        self::execute("UPDATE notes SET archived = :val, weight = :weight WHERE id = :id ", ["val" => 1, "id" => $this->note_id, "weight" => $max + 1]);
+        $this->unpin();
     }
 
     public function unarchive(): void
     {
-        self::execute("UPDATE notes SET archived = :val WHERE id = :id", ["val" => 0, "id" => $this->note_id]);
+        $max = $this->max_notes_unpinned();
+        self::execute("UPDATE notes SET archived = :val, weight = :weight  WHERE id = :id", ["val" => 0, "id" => $this->note_id, "weight" => $max + 1]);
     }
     public function pin(): void
     {
-        self::execute("UPDATE notes SET pinned = :val WHERE id = :id", ["val" => 1, "id" => $this->note_id]);
+        $max = $this->max_notes_pinned();
+        self::execute("UPDATE notes SET pinned = :val, weight = :weight WHERE id = :id", ["val" => 1,"weight" => $max + 1, "id" => $this->note_id]);
     }
     public function unpin(): void
     {
-        self::execute("UPDATE notes SET pinned = :val WHERE id = :id", ["val" => 0, "id" => $this->note_id]);
+        $max = $this->max_notes_unpinned();
+        self::execute("UPDATE notes SET pinned = :val, weight = :weight WHERE id = :id", ["val" => 0, "weight" => $max + 1, "id" => $this->note_id]);
     }
 
 
@@ -150,6 +155,18 @@ abstract class Note extends Model
             self::execute("INSERT INTO text_notes (id, content) VALUES (:id, :content)", ['id'=>$this->note_id, 'content'=>$this->get_content()]);
         }
         
+    }
+    public function update_note() : void {
+        self::execute('UPDATE Notes SET title = :title, pinned = :pinned, archived = :archived, weight = :weight, edited_at = NOW() WHERE id = :note_id', [
+            'title' => $this->title,
+            'pinned' => $this->pinned ? 1 : 0,
+            'archived' => $this->archived ? 1 : 0,
+            'weight' => $this->weight,
+            'note_id' => $this->note_id,
+        ]);
+        if($this->get_type() == TypeNote::TN) {
+            self::execute("UPDATE text_notes SET content = :content WHERE id = :id", ['id'=>$this->note_id, 'content'=>$this->get_content()]);
+        }
     }
 
 
@@ -262,25 +279,26 @@ abstract class Note extends Model
 
 
 
-    public function persist(): Note|array
-    {
-        if ($this->note_id == null) {
+    public function persist(): Note|array {  
+         $errors = [];
+         if ($this->note_id == null) {
+           
             $errors = $this->validate();
             if (empty($errors)) {
                 $this->insert();
                 return $this;
-            } else {
-                return $errors;
             }
+            else 
+                return $errors;
         } else {
-            self::execute('UPDATE Notes SET title = :title, pinned = :pinned, archived = :archived, weight = :weight, edited_at = NOW() WHERE id = :note_id', [
-                'title' => $this->title,
-                'pinned' => $this->pinned ? 1 : 0,
-                'archived' => $this->archived ? 1 : 0,
-                'weight' => $this->weight,
-                'note_id' => $this->note_id,
-            ]);
-            return $this;
+            $errors = $this->validate();
+            if (empty($errors)) {
+                $this->update_note();
+                return $this;
+            }
+          
+        
+            return $errors;
         }
     }
 
@@ -422,11 +440,36 @@ abstract class Note extends Model
     public function delete_from_share(int $user_id) {
         self::execute("delete from note_shares where note = :note_id and user = :user_id", ['note_id'=>$this->note_id, 'user_id'=>$user_id]);
     }
+    // le poids maximum dde toutes les notes
     public function max_weight()  {
         $query = self::execute("select MAX(weight) as max_weight from notes where owner = :current_user", ['current_user'=>$this->owner]);
         $data = $query->fetch();
         return $data['max_weight'];
     }
+
+    // Le poids max des notes pinned 
+    public function max_notes_pinned() {
+        $query = self::execute("SELECT MAX(weight) AS max_weight FROM notes WHERE  owner = :current_user AND pinned = :pinned",
+                             ['current_user'=>$this->owner, 'pinned' => 1]);
+        $data = $query->fetch();
+        return $data['max_weight'];
+    }
+
+      // Le poids max des notes unpinned 
+    public function max_notes_unpinned() {
+        $query = self::execute("SELECT MAX(weight) AS max_weight FROM notes WHERE  owner = :current_user AND pinned = :pinned",
+                             ['current_user'=>$this->owner, 'pinned' => 0]);
+        $data = $query->fetch();
+        return $data['max_weight'];
+    }
+        // Le poids max des notes archived 
+    public function max_notes_archived() {
+        $query = self::execute("SELECT MAX(weight) AS max_weight FROM notes WHERE  owner = :current_user AND archived = :archived",
+                                 ['current_user'=>$this->owner, 'archived' => 1]);
+        $data = $query->fetch();
+        return $data['max_weight'];
+    }
+
 
     public function list_labels() : array{
         $data = [];

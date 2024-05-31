@@ -14,7 +14,7 @@
 </head>
 <body>
     
-    <form method="post" action="note/add_text_note">
+    <form method="post" action="note/edit_text_note/<?= $id?>">
         <div class="edit">
             <a class="back" href="note/index"><span class="material-symbols-outlined">arrow_back_ios</span></a>
             <input class="material-symbols-outlined save" type="submit" id="saveButton" value='save'>
@@ -35,7 +35,7 @@
             <?php endif; ?>
         </div>
         <label for="content" class="note_body_title">Text</label>
-        <textarea class="note_body_text add_text_note" id="content" name="content"></textarea>
+        <textarea class="note_body_text add_text_note" id="content" name="content" ><?=$content?></textarea>
         <div id="contentError" class="invalid-feedback" style="display: none;"></div>
     </form>
     <script>

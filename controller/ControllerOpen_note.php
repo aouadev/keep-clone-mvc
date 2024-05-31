@@ -144,7 +144,7 @@ class ControllerOpen_note extends Controller
         }
     }
 
-    public function edit(): void
+   /* public function edit(): void
     {
         $errors = [];
 
@@ -161,7 +161,7 @@ class ControllerOpen_note extends Controller
         ($note->get_type() == "TextNote" ? new View("edit_text_note") : new View("edit_checklist_note"))->show([
             "note" => $note, "note_id" => $note_id, "created" => $this->get_created_time($note_id), "edited" => $this->get_edited_time($note_id), "archived" => $archived, "isShared_as_editor" => $isShared_as_editor, "isShared_as_reader" => $isShared_as_reader, "note_body" => $body, "pinned" => $pinned, "user_id" => $user_id
         ]);
-    }
+    }*/
     public function edit_checklist(): void
     {
         $user = $this->get_user_or_redirect();

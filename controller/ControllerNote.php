@@ -47,30 +47,48 @@ class ControllerNote extends Controller
         }
     }
 
-
-
-    
-    public function add_text_note() : void {
-        $title = '';
-        $user = $this->get_user_or_redirect();
-        $errors = []; 
+    //  Méthode pour ajouter ou éditer une texte note
+    public function edit_text_note() : void {
+        if (isset($_GET['param1']) && isset($_GET['param1']) !== "") {
+            $errors = [];
+            $id = $_GET['param1'];
+            if ($id != 0) {
+            $note_id = $_GET['param1'];
+            $note = Note::get_note_by_id($note_id);
+            $title = $note->title;
+            $content = $note->get_content();
+            } else {
+                $title = '';
+                $content = '';
+            }
         if(isset($_POST['title']) && isset($_POST['content'])) {
+            $user = $this->get_user_or_redirect();
             $title = $_POST['title'];
             $content = $_POST['content'];
-            $errors = $user->validate_name($title);
-            $errors = array_merge($errors, $user->validate_title_note($title));
-            if(empty($errors)) {
+            $errors = $user->validate_name($title); // l'utilisation de la même méthode de validation du nom de l'utilisateur
+            if($id == 0) {
+                $errors = array_merge($errors, $user->validate_title_note($title));
                 $note = new TextNote($title, $user->id, Date("Y-m-d H:i:s"));
                 $weight = $note->max_weight();
                 $note->set_weight($weight+1);
                 $note->set_content($content);
+            } else {
+              
+                $note->title = $title;
+                $note->set_content($content);
+            }
+            if(empty($errors)) {
                 $note->persist();
                 $this->redirect("open_note", "index/$note->note_id");
             }
         } 
-        (new view("add_text_note"))->show(["errors" => $errors, 'title' =>$title]);  
     }
-  
+        (new view("add_text_note"))->show(["errors" => $errors, 'title' =>$title, 'content' => $content, 'id' => $id]);
+        
+    }
+         
+    
+
     public function drag_and_drop() {
         
         if(isset($_POST['arrayorder'] , $_POST['update'])) {
@@ -165,23 +183,8 @@ class ControllerNote extends Controller
         (new View("add_checklist_note"))->show(["errors" => $errors]);
     }
 
-    // Supprime une note
-   /* public function delete_note()
-    {
-        if (isset($_GET["param1"]) && isset($_GET["param1"]) !== "") {
-            $note_id = $_GET['param1'];
-            $note = Note::get_note_by_id($note_id);
-            $user = $this->get_user_or_redirect();
-            if ($note->delete($user)) {
-                // Rediriger l'utilisateur vers la liste des notes après la suppression
-                $this->redirect("user", "my_archives");
-            } else {
-                throw new Exception("vous n'êtes pas l'auteur de cette note");
-            }
-        } else {
-            throw new Exception("Missing ID");
-        }
-    }*/
+  
+    // Supprimer une Note
     public function delete_note()  {
         if (isset($_POST['delete_note'])) {
             $note_id = $_POST['delete_note'];

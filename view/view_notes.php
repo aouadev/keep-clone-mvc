@@ -35,14 +35,14 @@
         <?php if (count($notes_pinned) != 0 && count($notes_unpinned) != 0) :  ?>
             <?php for ($i = 0; $i < count($notes_pinned); $i++) { ?>
                 <div class="note">
+                <a class="link-note-archivee" href='open_note/index/<?= $notes_pinned[$i]["id"]; ?>/<?=$back?>/0'>
                     <p class="note-title"><?= $notes_pinned[$i]["title"]; ?></p>
-                    <a class="link-note-archivee" href='open_note/index/<?= $notes_pinned[$i]["id"]; ?>/<?=$back?>/0'>
-                        <div class="note-content">
+                    <div class="note-content">
                             <?php if ($notes_pinned[$i]["content"] && $notes_pinned[$i]["content"] !== "") : ?>
                                 <div class="content_text">
                                     <?= $notes_pinned[$i]["content"] ?>
                                 </div>
-                            <?php else : ?>
+                            <?php elseif($notes_pinned[$i]['content_checklist']): ?>
                                 <div class="content_check">
                                     <div class="check_item">
                                         <?php foreach ($notes_pinned[$i]["content_checklist"] as $checklist_item) : ?>
@@ -81,14 +81,14 @@
     <div id="unpinned" class="connecedSortable view_notes_pinned_unpinned">
         <?php for ($i = 0; $i < count($notes_unpinned); $i++) { ?>
             <div class="note">
+            <a class="link-note-archivee" href='open_note/index/<?= $notes_unpinned[$i]["id"]; ?>/<?=$back?>/0'>
                 <p class="note-title"><?= $notes_unpinned[$i]["title"];  ?></p>
-                <a class="link-note-archivee" href='open_note/index/<?= $notes_unpinned[$i]["id"]; ?>/<?=$back?>/0'>
-                <div class="note-content">
-                    <?php if ($notes_unpinned[$i]["content"] && $notes_unpinned[$i]["content"] !== "") : ?>
+             <div class="note-content">
+                    <?php if ($notes_unpinned[$i]["content"] && !empty($notes_unpinned[$i]["content"])): ?>
                         <div class="content_text">
                             <?= $notes_unpinned[$i]["content"] ?>
                         </div>
-                        <?php else : ?>
+                        <?php elseif($notes_unpinned[$i]['content_checklist']): ?>
                             <div class="content_check">
                                 <div class="check_item">
                                     <?php foreach ($notes_unpinned[$i]['content_checklist'] as $checklist_item) : ?>
@@ -127,7 +127,7 @@
                 
                 <span class="material-symbols-outlined text-warning text-lg  text-lg-end m-2 float-end">checklist</span>
             </a>
-                <a href="note/add_text_note">
+                <a href="note/edit_text_note/0">
                  <!--   <i class="fa-solid fa-note-sticky text-lg  text-lg-end m-2 float-end text-warning"></i>-->
                     <span class="material-symbols-outlined text-warning text-lg  text-lg-end m-2 float-end">draft</span>
                 </a>
