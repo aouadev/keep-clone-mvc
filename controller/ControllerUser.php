@@ -26,7 +26,7 @@ class ControllerUser extends Controller {
             $sharer = User::get_user_by_id($shared_by);
             $shared_by_name = $sharer->full_name;
             $shared_notes_by = $user->get_shared_by($shared_by);
-            $my_labels = $sharer->get_all_my_labels();
+            $my_labels = $sharer->get_all_my_labels($sharer->id);
             foreach($shared_notes_by as $shared) {
                 if($shared["editor"] == 1)
                     $shared_notes_as_editor[] = $shared;

@@ -184,13 +184,46 @@ class User extends Model
         return $sharers;
     }
 
-    public function get_notes_pinned(): array
+  /*  public function get_notes_pinned(): array
     {
         return Note::get_notes_pinned($this);
     }
     public function get_notes_unpinned(): array
     {
         return Note::get_notes_unpinned($this);
+    }*/
+    private function get_notes(bool $pinned): array
+    {
+        $pinnedCondition = $pinned ? '1' : '0';
+
+        $notes = [];
+        $query = self::execute("SELECT * FROM notes WHERE owner = :ownerid AND archived = 0 AND pinned = :pinned ORDER BY -weight", ["ownerid" => $this->id, "pinned" => $pinnedCondition]);
+        $notes = $query->fetchAll();
+        $content_checklist = [];
+        foreach ($notes as &$row) {
+            $dataQuery = self::execute("SELECT content FROM text_notes WHERE id = :note_id", ["note_id" => $row["id"]]);
+            $content = $dataQuery->fetchColumn();
+
+            if (!$content) {
+                $dataQuery = self::execute("SELECT content, checked FROM checklist_note_items WHERE checklist_note = :note_id order by checked, id ", ["note_id" => $row["id"]]);
+                $content_checklist = $dataQuery->fetchAll();
+            }
+            $row["content"] = $content;
+            $row["content_checklist"] = $content_checklist;
+        }
+
+        return $notes;
+    }
+
+
+    public function get_notes_pinned(): array
+    {
+        return self::get_notes(true);
+    }
+
+    public function get_notes_unpinned(): array
+    {
+        return self::get_notes(false);
     }
 
 
@@ -254,26 +287,9 @@ class User extends Model
         return $error;
         
     }
-    public function get_all_labels() : array {
-        $data = [];
-        $query = self::execute("select distinct label from notes join note_labels 
-        on note_labels.note = notes.id where notes.owner = :user_id " , ["user_id"=>$this->id]);
-        $data = $query->fetchAll();
-        return $data;
-    }
-    public function other_labels($note_id) :array {
-        $data = [];
-        $query = self::execute("SELECT DISTINCT label FROM notes
-                                JOIN note_labels ON note_labels.note = notes.id WHERE notes.owner = :user_id
-                                AND label NOT IN (SELECT label FROM note_labels 
-                                WHERE note_labels.note = :note_id )", ["user_id"=>$this->id, "note_id" => $note_id]);
-        $data = $query->fetchAll();
-        return $data;
-    
-    }
-    public function get_all_my_labels() {
+    public function get_all_my_labels(int $user_id) {
         $query = self::execute("SELECT id, label FROM notes JOIN note_labels ON 
-                                note_labels.note = notes.id WHERE owner = :owner", ["owner" => $this->id]);
+                                note_labels.note = notes.id WHERE owner = :owner", ["owner" => $user_id]);
          return $query->fetchAll();                       
     }
 }
