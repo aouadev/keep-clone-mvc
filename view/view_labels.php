@@ -13,11 +13,10 @@
     <script src="JS/edit_errors.js" ></script>
 </head>
 <body>
-
-    
+  
     <div class="container mt-3">
         <div class="">
-            <a class="back" href="<?=$url_back_page?>"><span class="material-symbols-outlined">arrow_back_ios</span></a> 
+            <a class="back" href="<?=$back?>"><span class="material-symbols-outlined">arrow_back_ios</span></a> 
           
         </div>
         

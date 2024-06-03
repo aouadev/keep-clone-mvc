@@ -69,6 +69,7 @@
                         <a class="link-note-archivee" href='open_note/index/<?= $notes_pinned[$i]["id"]; ?>/<?=$back?>/0'>
                             <p class="note-title"><?= $notes_pinned[$i]["title"]; ?></p>
                             <div class="note-content">
+                            <?php var_dump($notes_pinned[$i]['weight']); ?>
                                 <?php if ($notes_pinned[$i]["content"] && $notes_pinned[$i]["content"] !== "") : ?>
                                     <div class="content_text">
                                         <?= $notes_pinned[$i]["content"] ?>
@@ -109,8 +110,10 @@
                         <a class="link-note-archivee" href='open_note/index/<?= $notes_unpinned[$i]["id"]; ?>/<?=$back?>/0'>
                             <p class="note-title"><?= $notes_unpinned[$i]["title"];  ?></p>
                             <div class="note-content">
+                            <?php var_dump($notes_unpinned[$i]['weight']); ?>
                                 <?php if ($notes_unpinned[$i]["content"] && !empty($notes_unpinned[$i]["content"])): ?>
                                     <div class="content_text">
+                                   
                                         <?= $notes_unpinned[$i]["content"] ?>
                                     </div>
                                 <?php elseif($notes_unpinned[$i]['content_checklist']): ?>

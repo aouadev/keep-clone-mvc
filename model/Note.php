@@ -115,11 +115,32 @@ abstract class Note extends Model
     public function pin(): void
     {
         self::execute("UPDATE notes SET pinned = :val  WHERE id = :id", ["val" => 1,"id" => $this->note_id]);
+        $this->permut_notes(1);
+  
+       
+  
+        
+    
+    }
+    private function permut_notes(int $pinned) {
+        $query = self::execute("SELECT id from notes WHERE owner = :owner AND pinned = :val ORDER BY -weight",["owner"=> $this->owner, "val" => $pinned]);
+        $res = $query->fetchAll();
+        $array = array_column($res, 'id'); 
+        $index = array_search($this->note_id, $array);
+        $weight_max = Note::get_note_by_id($array[0])->weight;
+        for($i = 0; $i < $index; ++$i) {
+            $note_next = Note::get_note_by_id($array[$i + 1]);
+            $weight = $note_next->weight;
+            self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" => -$i,"id" => $array[$i + 1]]);
+            self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" =>$weight,"id" => $array[$i]]);
+        }
+        self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" =>$weight_max,"id" => $this->note_id]);
     }
     public function unpin(): void
     {
        
         self::execute("UPDATE notes SET pinned = :val  WHERE id = :id", ["val" => 0, "id" => $this->note_id]);
+        $this->permut_notes(0);
     }
 
 
@@ -172,39 +193,7 @@ abstract class Note extends Model
 
 
 
-    private static function get_notes(User $user, bool $pinned): array
-    {
-        $pinnedCondition = $pinned ? '1' : '0';
 
-        $notes = [];
-        $query = self::execute("SELECT * FROM notes WHERE owner = :ownerid AND archived = 0 AND pinned = :pinned ORDER BY -weight", ["ownerid" => $user->id, "pinned" => $pinnedCondition]);
-        $notes = $query->fetchAll();
-        $content_checklist = [];
-        foreach ($notes as &$row) {
-            $dataQuery = self::execute("SELECT content FROM text_notes WHERE id = :note_id", ["note_id" => $row["id"]]);
-            $content = $dataQuery->fetchColumn();
-
-            if (!$content) {
-                $dataQuery = self::execute("SELECT content, checked FROM checklist_note_items WHERE checklist_note = :note_id order by checked, id ", ["note_id" => $row["id"]]);
-                $content_checklist = $dataQuery->fetchAll();
-            }
-            $row["content"] = $content;
-            $row["content_checklist"] = $content_checklist;
-        }
-
-        return $notes;
-    }
-
-
-    public static function get_notes_pinned(User $user): array
-    {
-        return self::get_notes($user, true);
-    }
-
-    public static function get_notes_unpinned(User $user): array
-    {
-        return self::get_notes($user, false);
-    }
 
 
     // Supprime une note
@@ -458,13 +447,7 @@ abstract class Note extends Model
     }
 
 
-    public function list_labels() : array{
-        $data = [];
-        $query = self::execute("select distinct * from note_labels where note = :id", ["id" => $this->note_id]);
-        $data = $query->fetchAll();
-    
-        return $data;
-    }
+  
   
     public function delete_label($note_id, $label){
         self::execute("delete from note_labels where note = :id and label = :label", ['id'=>$note_id, 'label'=>$label]);
@@ -492,6 +475,33 @@ abstract class Note extends Model
         $query = self::execute("select label from note_labels where note = :id and label = :label", ["id" => $this->note_id, "label"=>$label]);
         return $query->fetch();
     }
+
+    public function list_labels() : array{
+        $data = [];
+        $query = self::execute("select distinct * from note_labels where note = :id", ["id" => $this->note_id]);
+        $data = $query->fetchAll();
+    
+        return $data;
+    }
+    public function get_all_labels(int $user_id) : array {
+        $data = [];
+        $query = self::execute("select distinct label from notes join note_labels 
+        on note_labels.note = notes.id where notes.owner = :user_id " , ["user_id"=>$user_id]);
+        $data = $query->fetchAll();
+        return $data;
+    }
+
+    public function other_labels(int $note_id, int $user_id) :array {
+        $data = [];
+        $query = self::execute("SELECT DISTINCT label FROM notes
+                                JOIN note_labels ON note_labels.note = notes.id WHERE notes.owner = :user_id
+                                AND label NOT IN (SELECT label FROM note_labels 
+                                WHERE note_labels.note = :note_id )", ["user_id"=>$user_id, "note_id" => $note_id]);
+        $data = $query->fetchAll();
+        return $data;
+    
+    }
+   
  
 
     

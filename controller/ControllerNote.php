@@ -12,7 +12,7 @@ class ControllerNote extends Controller
         $user = $this->get_user_or_redirect();
         $notes_pinned = $user->get_notes_pinned();
         $notes_unpinned = $user->get_notes_unpinned();
-        $my_labels = $user->get_all_my_labels();
+        $my_labels = $user->get_all_my_labels($user->id);
    
        
         (new View("notes"))->show(["currentPage" => "my_notes", 
@@ -289,9 +289,11 @@ class ControllerNote extends Controller
             $note = Note::get_note_by_id($note_id);
             $url_back_page = "open_note/index/$note_id";
             $array_labels = $note->list_labels();
-            $user = User::get_user_by_id($note->owner);
-            $array_all_labels = $user->get_all_labels();
-            $other_labels = $user->other_labels($note_id);
+            $user_id = $note->owner;
+            
+            $other_labels = $note->other_labels($note_id, $user_id);
+            var_dump($other_labels);
+            
             $errors = [];
             if (isset($_POST['delete'])) {
                 $label = $_POST['delete'];
@@ -307,8 +309,8 @@ class ControllerNote extends Controller
                 }
                
     }
-        (new view('labels'))->show(["url_back_page" => $url_back_page, 
-        "labels" => $array_labels, "all_labels"=> $array_all_labels,'note_id'=>$note_id,
+        (new view('labels'))->show(["back" => $url_back_page, 
+        "labels" => $array_labels,'note_id'=>$note_id,
          "other_labels"=>$other_labels, "errors"=>$errors, "label"=>$label]);
         
     }

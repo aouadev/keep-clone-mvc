@@ -23,13 +23,13 @@
     <div class="note_body_checklist">
         <?php foreach($note_body as $row): ?>
             <?php if($row['checked']): ?>
-                <form class="check_form" action="openNote/update_checked/<?=$note_id?>/<?=$as_editor ?>" method="post">
+                <form class="check_form" action="open_note/update_checked/<?=$note_id?>/<?=$as_editor ?>" method="post">
                     <input type="text" name="uncheck"  value="<?=$row["id"]?>" hidden>
                     <input class="material-symbols-outlined" id="check_submit" type="submit" value='check_box'>
                     <label class="check_label" for="uncheck"> <?=$row["content"]?></label>
                 </form>
             <?php else: ?>
-                <form class="check_form" action="openNote/update_checked/<?=$note_id?>/<?=$as_editor ?>" method="post">
+                <form class="check_form" action="open_note/update_checked/<?=$note_id?>/<?=$as_editor ?>" method="post">
                         <input type="text" name="check"  value="<?=$row["id"]?>" hidden>
                         <input class="material-symbols-outlined" id="check_submit" type="submit" value= "check_box_outline_blank" >
                         <label class="uncheck_label" for="check"> <?=$row["content"]?></label>

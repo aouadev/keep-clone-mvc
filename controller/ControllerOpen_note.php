@@ -102,7 +102,7 @@ class ControllerOpen_note extends Controller
                     CheckListNoteItem::update_checked($checklist_item_id, $checked);
                 }
             }
-            $this->redirect("openNote", "index/$note");
+            $this->redirect("open_note", "index/$note");
        }
 }
     
