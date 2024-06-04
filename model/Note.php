@@ -159,6 +159,45 @@ abstract class Note extends Model
         $this->permut_notes_pin_unpin(0);
     }
 
+    public function move_right() {
+        $pinned = $this->pinned;
+        $query = self::execute("SELECT id FROM notes where pinned = :pinned AND owner = :owner ORDER BY -weight", ['pinned'=>$pinned, 'owner'=>$this->owner]);
+        $data = $query->fetchAll();
+        $array = array_column($data, 'id');
+        $index = array_search($this->note_id, $array);
+        $weight_current = $this->weight; //stocker le poids courant dans une variable
+        var_dump($weight_current);
+       
+        if ($index + 1 < count($array)) {
+            $weight_next = Note::get_note_by_id($array[$index + 1])->weight; // stocker le poids de la note suivante dans une variable
+            self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" => 0,"id" => $array[$index + 1]]); // donner des poids temporaire qui peuvent pas exister dans une autre note(négatif ou null)
+            self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" => -1,"id" => $this->note_id]);
+            self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" => $weight_current,"id" => $array[$index + 1]]); // switcher le poids entre les deux notes sans contradiction avec la contrainte du 1poids/user
+            self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" => $weight_next,"id" => $this->note_id]);
+        }
+
+        }
+        public function move_left() {
+            $pinned = $this->pinned;
+            $query = self::execute("SELECT id FROM notes where pinned = :pinned AND owner = :owner ORDER BY -weight", ['pinned'=>$pinned, 'owner'=>$this->owner]);
+            $data = $query->fetchAll();
+            $array = array_column($data, 'id');
+            $index = array_search($this->note_id, $array);
+            $weight_current = $this->weight; //stocker le poids courant dans une variable
+            var_dump($weight_current);
+           
+            if ($index  > 0) {
+                $weight_before = Note::get_note_by_id($array[$index - 1])->weight; // stocker le poids de la note précédente dans une variable
+                self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" => 0,"id" => $array[$index - 1]]); // donner des poids temporaire qui peuvent pas exister dans une autre note(négatif ou null)
+                self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" => -1,"id" => $this->note_id]);
+                self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" => $weight_current,"id" => $array[$index - 1]]); // switcher le poids entre les deux notes sans contradiction avec la contrainte du 1poids/user
+                self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" => $weight_before,"id" => $this->note_id]);
+            }
+    
+            }
+        
+    
+
 
 
 
@@ -316,34 +355,6 @@ abstract class Note extends Model
         } else return Note::create_Note($data);
     }
 
-    public function get_note_down(User $user, int $note_id, int $weight, bool $pin): Note | false
-    {
-        $query = self::execute("
-         SELECT * FROM notes n
-         WHERE owner = :ownerid AND n.id <> :note_id AND archived = 0 AND pinned = :pin AND weight < :weight 
-         ORDER BY -weight LIMIT 1
-         ", ["ownerid" => $user->id, "note_id" => $note_id, "pin" => $pin, "weight" => $weight]);
-
-        $data = $query->fetch();
-        if (!$data)
-            return false;
-
-        else return Note::create_Note($data);
-    }
-
-    public function move_db(Note $second): Note
-    {
-        $weight_second = $second->get_weight();
-        $second_id = $second->note_id;
-        self::execute(
-            'UPDATE notes SET weight = :weight_note2 WHERE id = :id_note1',
-            ['id_note1' => $this->note_id, 'weight_note2' => $weight_second]
-        );
-        self::execute('UPDATE notes SET weight = :weight_note1 WHERE id = :id_note2', ['id_note2' => $second_id, 'weight_note1' => $this->weight]);
-
-
-        return $this;
-    }
 
     public static function get_note_by_id(int $note_id): Note |false
     {

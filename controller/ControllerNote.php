@@ -23,35 +23,33 @@ class ControllerNote extends Controller
                                     "my_labels" => $my_labels]);
     }
 
-    public function move_up(): void
-    {
-        $user = $this->get_user_or_redirect();
-        if (isset($_POST["up"]) && $_POST["up"] != "") {
-            $id = $_POST["up"];
+
+    // Méthode pour bouger la note vers la droite
+    public function move_right() : void {
+        if (isset($_POST["right"]) && $_POST["right"] != "") {
+            $id = $_POST["right"];
             $note = Note::get_note_by_id($id);
-            if ($note === false)
-                throw new Exception("undefined note");
-            $other = $note->get_note_up($user, $id, $note->get_weight(), $note->isPinned());
-            $note->move_db($other);
+            $note->move_right();
             $this->redirect("note", "index");
+
+
         } else {
-            throw new Exception("Missing ID");
-        }
+        throw new Exception("Missing ID");
     }
-    public function move_down(): void
-    {
-        $user = $this->get_user_or_redirect();
-        if (isset($_POST["down"]) && $_POST["down"] != "") {
-            $id = $_POST["down"];
+}
+    //Méthode pour faire bouger la note vers la gauche
+    public function move_left() : void {
+        if (isset($_POST["left"]) && $_POST["left"] != "") {
+            $id = $_POST["left"];
             $note = Note::get_note_by_id($id);
-            if ($note === false)
-                throw new Exception("undefined note");
-            $other = $note->get_note_down($user, $id, $note->get_weight(), $note->isPinned());
-            $other->move_db($note);
+            $note->move_left();
             $this->redirect("note", "index");
+
+
         } else {
-            throw new Exception("Missing ID");
-        }
+        throw new Exception("Missing ID");
+    }
+        
     }
 
     //  Méthode pour ajouter ou éditer une texte note
