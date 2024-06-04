@@ -102,31 +102,10 @@ abstract class Note extends Model
         }
         return $archives;
     }
-    public function archive(): void
-    {
-        self::execute("UPDATE notes SET archived = :val  WHERE id = :id ", ["val" => 1, "id" => $this->note_id]);
-        $this->unpin();
-    }
 
-    public function unarchive(): void
-    {
-     self::execute("UPDATE notes SET archived = :val  WHERE id = :id", ["val" => 0, "id" => $this->note_id]);
-    }
-    public function pin(): void
-    {
-        self::execute("UPDATE notes SET pinned = :val  WHERE id = :id", ["val" => 1,"id" => $this->note_id]);
-        $this->permut_notes(1);
-  
-       
-  
-        
-    
-    }
-    private function permut_notes(int $pinned) {
-        $query = self::execute("SELECT id from notes WHERE owner = :owner AND pinned = :val ORDER BY -weight",["owner"=> $this->owner, "val" => $pinned]);
-        $res = $query->fetchAll();
-        $array = array_column($res, 'id'); 
-        $index = array_search($this->note_id, $array);
+    // Archiver désarchiver, épingler dépingler et gestion du poids
+    // méthode de permutation qui va être utilisser dans toutes les opérations
+    private function permut_notes(Array $array, int $index) {    
         $weight_max = Note::get_note_by_id($array[0])->weight;
         for($i = 0; $i < $index; ++$i) {
             $note_next = Note::get_note_by_id($array[$i + 1]);
@@ -135,12 +114,49 @@ abstract class Note extends Model
             self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" =>$weight,"id" => $array[$i]]);
         }
         self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" =>$weight_max,"id" => $this->note_id]);
+        
     }
-    public function unpin(): void
-    {
-       
+
+    // attribuer le poids max de sa liste à la note pinned ou unpinned 
+    private function permut_notes_pin_unpin(int $pinned) {
+        $query = self::execute("SELECT id from notes WHERE owner = :owner AND pinned = :val ORDER BY -weight",["owner"=> $this->owner, "val" => $pinned]);
+        $res = $query->fetchAll();
+        $array = array_column($res, 'id'); 
+        $index = array_search($this->note_id, $array);
+        $this->permut_notes($array, $index);
+    }
+
+    //  Archiver une note et la désépingler puis lui attribuer  le poid maximum des notes archivés
+    public function archive(): void {
+        self::execute("UPDATE notes SET archived = :val  WHERE id = :id ", ["val" => 1, "id" => $this->note_id]);
+        if ($this->pinned = 1) {
+            self::execute("UPDATE notes SET pinned = :val  WHERE id = :id", ["val" => 0, "id" => $this->note_id]);
+        }
+        $query = self::execute("SELECT id from notes WHERE owner = :owner AND archived = :val ORDER BY -weight",["owner"=> $this->owner, "val" => 1]);
+        $res = $query->fetchAll();
+        $array = array_column($res, 'id'); 
+        $index = array_search($this->note_id, $array);
+        $this->permut_notes($array, $index);
+
+    }
+
+    // désarchiver une note et lui attribuer le poids max des notes non épinglés
+    public function unarchive(): void {
+     self::execute("UPDATE notes SET archived = :val  WHERE id = :id", ["val" => 0, "id" => $this->note_id]);
+     $this->permut_notes_pin_unpin(0);
+ 
+    }
+
+    // épingler une note et lui attribuer le poids max des notes épinglés
+    public function pin(): void {
+        self::execute("UPDATE notes SET pinned = :val  WHERE id = :id", ["val" => 1,"id" => $this->note_id]);
+        $this->permut_notes_pin_unpin(1);
+    }
+ 
+    //désépingler une note et lui attribuer le poids max des notes  non épinglés
+    public function unpin(): void{
         self::execute("UPDATE notes SET pinned = :val  WHERE id = :id", ["val" => 0, "id" => $this->note_id]);
-        $this->permut_notes(0);
+        $this->permut_notes_pin_unpin(0);
     }
 
 

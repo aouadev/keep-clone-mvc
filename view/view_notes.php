@@ -65,11 +65,11 @@
             <p class="title_note_pinned">Pinned</p>
             <div id="pinned" class="connecedSortable view_notes_pinned_unpinned">
                 <?php for ($i = 0; $i < count($notes_pinned); $i++) { ?>
-                    <div class="note">
+                    <div class="note .bg-success">
                         <a class="link-note-archivee" href='open_note/index/<?= $notes_pinned[$i]["id"]; ?>/<?=$back?>/0'>
                             <p class="note-title"><?= $notes_pinned[$i]["title"]; ?></p>
-                            <div class="note-content">
-                            <?php var_dump($notes_pinned[$i]['weight']); ?>
+                          
+                         
                                 <?php if ($notes_pinned[$i]["content"] && $notes_pinned[$i]["content"] !== "") : ?>
                                     <div class="content_text">
                                         <?= $notes_pinned[$i]["content"] ?>
@@ -87,7 +87,8 @@
                                         </div>
                                     </div>
                                 <?php endif; ?>
-                            </div>
+                     
+                        
                         </a>
                         <div class="my_labels">
                         <?php foreach ($my_labels as $label): ?>
@@ -96,7 +97,27 @@
                             <?php endif; ?>
 
                         <?php endforeach ;?>
+                            </div>
+                            <noscript>
+                        <div class="card-footer">
+                    <?php if ($i > 0) : ?>
+                        <form action="note/move_up" class="left" method="post">
+                            <input name="up" type="number" value='<?=$notes_pinned[$i]["id"] ?>' hidden>
+                            <input class="material-symbols-outlined"type='submit' value="keyboard_double_arrow_left">
+                        </form>
+                        <?php endif; ?>
+                    <?php if ($i < count($notes_pinned) - 1) : ?>
+                        <form action="note/move_down" class="right" method="post">
+                            <input name="down" type="number" value='<?=$notes_pinned[$i]["id"] ?>' hidden>
+                          <input class="material-symbols-outlined"type='submit' value="keyboard_double_arrow_right">
+                            
+                        </form>
+                        <?php endif; ?>
                     </div>
+                     </noscript>
+                 
+                    
+              
                     </div>
                                  
                 <?php } ?>
@@ -109,7 +130,7 @@
                     <div class="note">
                         <a class="link-note-archivee" href='open_note/index/<?= $notes_unpinned[$i]["id"]; ?>/<?=$back?>/0'>
                             <p class="note-title"><?= $notes_unpinned[$i]["title"];  ?></p>
-                            <div class="note-content">
+                         
                             <?php var_dump($notes_unpinned[$i]['weight']); ?>
                                 <?php if ($notes_unpinned[$i]["content"] && !empty($notes_unpinned[$i]["content"])): ?>
                                     <div class="content_text">
@@ -129,9 +150,8 @@
                                         </div>
                                     </div>
                                 <?php endif; ?>
-                            </div>
-                        </a>
-                        <div class="my_labels">
+                           
+                            <div class="my_labels">
                         <?php foreach ($my_labels as $label): ?>
                             <?php if($label['id'] == $notes_unpinned[$i]['id']): ?>
                                 <div class="label"><?=$label['label']?></div>
@@ -139,6 +159,25 @@
 
                         <?php endforeach ;?>
                     </div>
+                        </a>
+             
+                    <noscript>
+                        <div class="card-footer">
+                    <?php if ($i > 0) : ?>
+ 
+                        <form action="note/move_up" class="left" method="post">
+                            <input name="up" type="number" value='<?=$notes_unpinned[$i]["id"] ?>' hidden>
+                            <input class="material-symbols-outlined"type='submit' value="keyboard_double_arrow_left">
+                        </form>
+                        <?php endif; ?>
+                    <?php if ($i < count($notes_unpinned) - 1) : ?>
+                        <form action="note/move_down" class="right" method="post">
+                            <input name="down" type="number" value='<?=$notes_unpinned[$i]["id"] ?>' hidden>
+                            <input class="material-symbols-outlined"type='submit' value="keyboard_double_arrow_right">
+                        </form>
+                        <?php endif; ?>
+                    </div>
+                    </noscript>
                     </div>
                 <?php } ?>
             </div>

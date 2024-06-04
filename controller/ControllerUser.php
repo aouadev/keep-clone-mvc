@@ -11,7 +11,7 @@ class ControllerUser extends Controller {
     public function my_archives() : void {
         $user = $this->get_user_or_redirect();
         $archives = $user->get_archives();
-        $my_labels = $user->get_all_my_labels();
+        $my_labels = $user->get_all_my_labels($user->id);
     
         (new View("archives"))->show(["currentPage"=> "my_archives","archives"=>$archives, "sharers"=>$user->shared_by(), "my_labels" => $my_labels]);
     }
