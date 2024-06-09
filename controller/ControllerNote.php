@@ -101,8 +101,7 @@ class ControllerNote extends Controller
     public function edit_checklist_note() : void {
         $title_errors = [];
         $items_errors = [];
-        if (isset($_GET['param1']) && $_GET['param1'] !== "" 
-           ) {
+        if (isset($_GET['param1']) && $_GET['param1'] !== "" ) {
             $id = $_GET['param1'];
             if ($id != 0) {
                 $note = Note::get_note_by_id($id);
@@ -117,16 +116,13 @@ class ControllerNote extends Controller
             $user = $this->get_user_or_redirect();
             $title = $_POST['title'];
             $new_content = $_POST['content'];
-            for($i = 0; $i < count($content); $i++) {
-                if($new_content[$i] == '') 
+            for($i = 0; $i < count($new_content); $i++) {
+                if($new_content[$i] == '' && $id != 0) 
                     $note->delete_item($content[$i]['id']);
                 else {
                     $content[$i]['content'] = $new_content[$i];
                 }
             }
-       
-            
-  
             $title_errors = $user->validate_name($title); 
             $title_errors = array_merge($title_errors, $user->validate_title_note($id, $title));
             if (isset($_POST['item_content']) && $_POST['item_content'] != '' && count($title_errors) == 0) {
@@ -156,17 +152,15 @@ class ControllerNote extends Controller
                         $content[$i]['content'] = $new_content[$i];
                     }
                 }
-               
                 $note->set_content($content);
-                
-                
-             $note->persist();
+                $note->persist();
             $this->redirect("open_note", "index/$note->note_id");
             }
         } 
     }
-        (new view("add_note"))->show(["title_errors"=> $title_errors, "items_errors" => $items_errors, 'title' =>$title, 'content' => $content, 'id' => $id, 'item_content'=>'']);
-    }
+    (new view("add_checklist_note"))->show(["title_errors"=> $title_errors,"items_errors" => $items_errors, 
+                                                 'title' =>$title, 'content' => $content, 'id' => $id, 'item_content'=>'']);
+                                                }
 
     public static function allEmpty($array) {
         foreach($array as $arr) {
@@ -222,83 +216,6 @@ class ControllerNote extends Controller
 
 
   
-    public function add_checklist_note()
-    {
-        $user = $this->get_user_or_redirect();
-        $errors = [];
-        // Vérification des doublons pour les éléments
-        $duplicateErrors = [];
-        $duplicateItems = [];
-
-        if(isset($_POST['title']) && $_POST['title'] == "") {
-            $errors['title'] = "Title required";
-        }
-        if (isset($_POST['title'], $_POST['items']) && $_POST['title'] != "") {
-            $title = Tools::sanitize($_POST['title']);
-            $items = $_POST['items'];
-            // Initialisation d'un tableau pour les éléments non vides
-            $non_empty_items = [];
-
-            // Parcours des éléments pour ne sauvegarder que les non vides
-            foreach ($items as $item) {
-                if (!empty($item)) {
-                    $non_empty_items[] = $item;
-                }
-            }
-            $note = new ChecklistNote(
-                0,
-                $title,
-                $user->id,
-                date("Y-m-d H:i:s"),
-                false,
-                false,
-                0
-            );
-            $errors = $note->validate_title($title);
-
-
-            foreach ($non_empty_items as $key => $item) {
-                if (in_array($item, $duplicateItems)) {
-                    // Stocker l'erreur de doublon avec l'indice correspondant
-                    $duplicateErrors["item_$key"] = "Items must be unique.";
-                }
-                $duplicateItems[] = $item;
-            }
-
-
-            // Combinaison des erreurs de doublons avec d'autres erreurs
-            $errors = array_merge($errors, $duplicateErrors);
-        } 
-        if (empty($errors) && isset($_POST['title'], $_POST['items']) && $_POST['title'] != "") {
-            $note->persist();
-            $note->new();
-                // Parcours des erreurs de doublons
-            foreach ($non_empty_items as $key ) {
-                // Création d'une nouvelle instance de CheckListNoteItem
-                $content = $key; // Récupération du contenu de l'élément
-                $checklistNoteId = $note->note_id; // Récupération de l'identifiant de la note de checklist
-                $checked = false; // Par défaut, l'élément n'est pas coché
-                
-                // Création de l'instance CheckListNoteItem
-                $checklistItem = new CheckListNoteItem(
-                    0, // L'identifiant sera généré automatiquement par la base de données
-                    $checklistNoteId,
-                    $content,
-                    $checked
-                );
-                
-                // Enregistrement de l'élément dans la base de données
-                $checklistItem->persist();
-                }
-            
-            $this->redirect("openNote", "index", $note->note_id);
-        }
-
-        // Afficher la vue avec les erreurs
-        (new View("add_checklist_note"))->show(["errors" => $errors]);
-    }
-
-  
     // Supprimer une Note
     public function delete_note()  {
         if (isset($_POST['delete_note'])) {
@@ -316,53 +233,6 @@ class ControllerNote extends Controller
         }
         (new View('confirm_delete'))->show(["note" =>$note]);
     }
-
-    /*public function edit_checklist_note(): void
-
-    {
-        
-        $user = $this->get_user_or_redirect();
-        $errors = [];
-        if (isset($_GET["param1"]) && isset($_GET["param1"]) !== "") {
-            $id = $_GET['param1'];
-
-            $note = CheckListNote::get_note_by_id($id);
-            // Vérifie si la note existe
-            if ($note === false) {
-                throw new Exception("Undefined note");
-            }
-            if (isset($_POST["title"]) && $_POST["title"] != "") {
-                $title = Tools::sanitize($_POST["title"]);
-                $note = Note::get_note_by_id($id);
-                $errors = $note->validate_title($title);
-                if (empty($errors)) {
-
-                    $note->title = $title;
-                    $note->persist();
-                }
-            }
-            if (isset($_POST['delete']) && $_POST['delete']) {
-                $item_id = $_POST["delete"];
-                $item = CheckListNoteItem::get_item_by_id($item_id);
-                if ($item === false) {
-                    throw new Exception("Undefined checklist item");
-                }
-                // Supprime l'élément de la liste de contrôle
-                $item->delete();
-                $this->redirect("openNote", "edit/$id");
-            }
-            if (isset($_POST['new']) && $_POST["new"] != "") {
-                $new_item_content = Tools::sanitize($_POST['new']);
-                $new_item = new CheckListNoteItem(5, $note->note_id, $new_item_content, 0);
-                $new_item->persist();
-                $this->redirect("openNote", "edit/$id");
-            }
-            $this->redirect("openNote", "index/$id");
-        }
-    }
-*/
-
-
 
     public function open_shares() {
         if (isset($_GET['param1']) && isset($_GET['param1']) !=="") {
