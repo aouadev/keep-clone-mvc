@@ -17,6 +17,7 @@ class ControllerOpen_note extends Controller
             $isShared_as_reader = $note->isShared_as_reader($user_id);
             $as_editor = $note->as_editor($user_id);
             $body = $note->get_content();
+            $type = $note->get_type();
             $previous = "";
             $param3 = "";
             if (isset($_GET["param2"])) {
@@ -29,10 +30,10 @@ class ControllerOpen_note extends Controller
        
             
         }
-        ($note->get_type() == "TextNote" ? new View("open_text_note") : new View("open_checklist_note"))->show([
+        ($note->get_type() == "tn" ? new View("open_text_note") : new View("open_checklist_note"))->show([
             "note" => $note, "note_id" => $note_id, "get_time" => $this->get_time($note_id), "edited" => $this->get_edited_time($note_id),
              "archived" => $archived, "isShared_as_editor" => $isShared_as_editor, "isShared_as_reader" => $isShared_as_reader, "note_body" => $body,
-             "pinned" => $pinned, "user_id" => $user_id, "as_editor" => $as_editor, "back" => $previous, "param3" => $param3
+             "pinned" => $pinned, "user_id" => $user_id, "as_editor" => $as_editor, "back" => $previous, "param3" => $param3, 'type'=>$type
         ]);
     }
 
@@ -89,7 +90,7 @@ class ControllerOpen_note extends Controller
         if(isset($_GET['param1']) && isset($_GET['param1']) != "") {
             $note = $_GET['param1'];
             var_dump($note);
-            if (isset($_GET['param2']) && isset($_GET['param2']) == true) {
+            if (isset($_GET['param2']) && isset($_GET['param2']) == true || isset($_GET['param2']) == "") {
                 if (isset($_POST["check"])) {
                     $checklist_item_id = $_POST["check"];
                     $note_id = CheckListNoteItem::get_checklist_note($checklist_item_id);

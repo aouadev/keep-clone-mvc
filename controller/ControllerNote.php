@@ -54,42 +54,152 @@ class ControllerNote extends Controller
 
     //  Méthode pour ajouter ou éditer une texte note
     public function edit_text_note() : void {
-        if (isset($_GET['param1']) && isset($_GET['param1']) !== "") {
-            $errors = [];
+        $errors = [];
+        if (isset($_GET['param1']) && $_GET['param1'] !== "" 
+           ) {
             $id = $_GET['param1'];
+      
             if ($id != 0) {
-            $note_id = $_GET['param1'];
-            $note = Note::get_note_by_id($note_id);
-            $title = $note->title;
-            $content = $note->get_content();
-            } else {
-                $title = '';
-                $content = '';
+                $note_id = $_GET['param1'];
+                $note = Note::get_note_by_id($note_id);
+                $title = $note->title;
+                $content = $note->get_content();
             }
-        if(isset($_POST['title']) && isset($_POST['content'])) {
+            else {
+                $content = '' ;
+                $title = '';
+            }
+        if(isset($_POST['title']) && (isset($_POST['content']))) {
             $user = $this->get_user_or_redirect();
             $title = $_POST['title'];
             $content = $_POST['content'];
+            
+  
             $errors = $user->validate_name($title); 
-            if($id == 0) {
-                $errors = array_merge($errors, $user->validate_title_note($title));
-                $note = new TextNote($title, $user->id, Date("Y-m-d H:i:s"));
-                $weight = $note->max_weight();
-                $note->set_weight($weight+1);
-                $note->set_content($content);
-            } else {
-                $errors = array_merge($errors, $user->validate_title_note($title));
-                $note->title = $title;
-                $note->set_content($content);
-            }
-            if(empty($errors)) {
-                $note->persist();
-                $this->redirect("open_note", "index/$note->note_id");
+            $errors = array_merge($errors, $user->validate_title_note($id, $title));
+            if(empty($errors) ) {
+                if($id == 0) {
+                    $note = new TextNote($title, $user->id, Date("Y-m-d H:i:s"));
+                    $weight = $note->max_weight();
+                    $note->set_weight($weight + 1);
+                    $note->set_content($content);
+                
+                } else {
+            
+                    $note->title = $title;
+                    $note->set_content($content);
+                }
+               $note->persist();
+               $this->redirect("open_note", "index/$note->note_id");
             }
         } 
     }
-        (new view("add_text_note"))->show(["errors" => $errors, 'title' =>$title, 'content' => $content, 'id' => $id]);
+        (new view("add_text_note"))->show(["errors"=> $errors, 'title' =>$title, 'content' => $content, 'id' => $id]);
+    }
+    
+    //  Méthode pour ajouter ou éditer une texte note
+    public function edit_checklist_note() : void {
+        $title_errors = [];
+        $items_errors = [];
+        if (isset($_GET['param1']) && $_GET['param1'] !== "" 
+           ) {
+            $id = $_GET['param1'];
+            if ($id != 0) {
+                $note = Note::get_note_by_id($id);
+                $title = $note->title;
+                $content = $note->get_content();
+            }
+            else {
+                $content = [] ;
+                $title = '';
+            }
+        if(isset($_POST['title']) && (isset($_POST['content']))) {
+            $user = $this->get_user_or_redirect();
+            $title = $_POST['title'];
+            $new_content = $_POST['content'];
+            for($i = 0; $i < count($content); $i++) {
+                if($new_content[$i] == '') 
+                    $note->delete_item($content[$i]['id']);
+                else {
+                    $content[$i]['content'] = $new_content[$i];
+                }
+            }
+       
+            
+  
+            $title_errors = $user->validate_name($title); 
+            $title_errors = array_merge($title_errors, $user->validate_title_note($id, $title));
+            if (isset($_POST['item_content']) && $_POST['item_content'] != '' && count($title_errors) == 0) {
+                $item_content = $_POST['item_content'];
+                $note->add_item($id, $item_content);
+                $this->redirect("note", "edit_checklist_note/$id");
+            }
+            if (isset($_POST['delete_item']) && count($title_errors) == 0) {
+                $item_id = $_POST['delete_item'];
+                $note->delete_item($item_id);
+                $this->redirect("note", "edit_checklist_note/$id");
+            }
+
+            for($i = 0; $i < count($new_content); $i++) {
+                $items_errors[$i] = CheckListNote::validateItems($new_content[$i], $new_content);
+            }
         
+            if(empty($title_errors) && $this->allEmpty($items_errors) ) {
+            
+                if($id == 0) {
+                    $note = new CheckListNote($title, $user->id, Date("Y-m-d H:i:s"));
+                    $weight = $note->max_weight();
+                    $note->set_weight($weight + 1);
+                } else {
+                    $note->title = $title;
+                    for($i = 0; $i < count($new_content); $i++) {
+                        $content[$i]['content'] = $new_content[$i];
+                    }
+                }
+               
+                $note->set_content($content);
+                
+                
+             $note->persist();
+            $this->redirect("open_note", "index/$note->note_id");
+            }
+        } 
+    }
+        (new view("add_note"))->show(["title_errors"=> $title_errors, "items_errors" => $items_errors, 'title' =>$title, 'content' => $content, 'id' => $id, 'item_content'=>'']);
+    }
+
+    public static function allEmpty($array) {
+        foreach($array as $arr) {
+            if(!empty($arr))
+                return false;
+        }
+        return true;
+            
+
+    }
+    public function add_item() {
+        if (isset($_POST['item_content']) && isset($_GET['param1']) && $_GET['param1'] != '') {
+            $note_id = $_GET['param1'];
+            $item_content = $_POST['item_content'];
+            $note = Note::get_note_by_id($note_id);
+            if ($item_content != '') {
+            $note->add_item($note_id, $item_content);
+            }
+            $this->redirect("note", "edit_checklist_note/$note_id");
+            
+        }
+
+
+    }
+    public function delete_item() {
+        if (isset($_POST['delete_item']) 
+            && isset($_GET['param1']) && $_GET['param1'] != '') {
+            $note_id = $_GET['param1'];
+            $item_id= $_POST['delete_item'];
+            $note = Note::get_note_by_id($note_id);
+            $note->delete_item($item_id);
+            $this->redirect("note", "edit_checklist_note/$note_id");
+        }
     }
          
     
@@ -197,15 +307,17 @@ class ControllerNote extends Controller
         }
         if (isset($_POST['delete_confirm'])) {
             $user = $this->get_user_or_redirect();
+      
             $note_id = $_POST['delete_confirm'];
             $note = Note::get_note_by_id($note_id);
+            if ($user->id == $note->owner || $user->role == "admin")
             $note->delete($user);
                $this->redirect("user", "my_archives");
         }
         (new View('confirm_delete'))->show(["note" =>$note]);
     }
 
-    public function edit_checklist_note(): void
+    /*public function edit_checklist_note(): void
 
     {
         
@@ -248,7 +360,7 @@ class ControllerNote extends Controller
             $this->redirect("openNote", "index/$id");
         }
     }
-
+*/
 
 
 

@@ -10,8 +10,8 @@ require_once "framework/Configuration.php";
 
 enum TypeNote
 {
-    const TN = "TextNote";
-    const CLN = "ChecklistNote";
+    const TN = "tn";
+    const CLN = "cn";
 }
 
 
@@ -227,6 +227,13 @@ abstract class Note extends Model
         if($this->get_type() == TypeNote::TN) {
             self::execute("INSERT INTO text_notes (id, content) VALUES (:id, :content)", ['id'=>$this->note_id, 'content'=>$this->get_content()]);
         }
+        else {
+            self::execute("INSERT INTO checklist_notes (id) VALUES (:id)", ['id'=>$this->note_id]);
+            foreach($this->get_content() as $item) {
+                if ($item['content'] != "")
+                    self::execute("INSERT INTO checklist_note_items (checklist_note, content, checked) VALUES (:id, :content, :checked)", ['id'=>$this->note_id, 'content'=>$item['content'],'checked' => 0]);
+            }
+        }
         
     }
     public function update_note() : void {
@@ -240,7 +247,29 @@ abstract class Note extends Model
         if($this->get_type() == TypeNote::TN) {
             self::execute("UPDATE text_notes SET content = :content WHERE id = :id", ['id'=>$this->note_id, 'content'=>$this->get_content()]);
         }
-    }
+        else {
+            echo "coucou";
+           // var_dump($this->get_content() );
+          //  $query = self::execute("SELECT content FROM checklist_note_items WHERE checklist_note = : id", ['id' => $this->note_id]);
+        
+            foreach($this->get_content() as $item) {
+                if ($item['content'] != "")
+                    self::execute("UPDATE checklist_note_items SET content = :content WHERE checklist_note = :note_id AND id = :id", ['note_id'=>$this->note_id, 'id'=>$item['id'], 'content'=>$item['content']]);
+            }
+        }
+     }
+
+     public function add_item(int $id, string $content) : void {
+        if($content != '') {
+            self::execute("INSERT INTO checklist_note_items (checklist_note, content, checked)
+             VALUES (:id, :content, :checked)", ['id'=>$id, 'content'=>$content,'checked' => 0]);
+        }
+     }
+     public function delete_item(int $id) : void {
+        self::execute("DELETE FROM checklist_note_items WHERE id = :id", ['id'=>$id]);
+        
+     }
+
 
 
 
@@ -261,6 +290,7 @@ abstract class Note extends Model
             self::execute("DELETE FROM text_notes WHERE id = :note_id", ['note_id' => $this->note_id]);
             self::execute("DELETE FROM checklist_notes WHERE id = :note_id", ['note_id' => $this->note_id]);
             self::execute("DELETE FROM note_shares WHERE note = :note_id", ['note_id' => $this->note_id]);
+            self::execute("DELETE FROM note_labels WHERE note = :note_id", ['note_id' => $this->note_id]);
             self::execute("DELETE FROM Notes WHERE id = :note_id", ['note_id' => $this->note_id]);
             return $this;
         }

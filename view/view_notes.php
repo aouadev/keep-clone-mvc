@@ -131,7 +131,7 @@
                         <a class="link-note-archivee" href='open_note/index/<?= $notes_unpinned[$i]["id"]; ?>/<?=$back?>/0'>
                             <p class="note-title"><?= $notes_unpinned[$i]["title"];  ?></p>
                          
-                            <?php var_dump($notes_unpinned[$i]['weight']); ?>
+                        
                                 <?php if ($notes_unpinned[$i]["content"] && !empty($notes_unpinned[$i]["content"])): ?>
                                     <div class="content_text">
                                    
@@ -190,7 +190,7 @@
     </div>
     <footer class="">
             <div class="position-relative bottom-0 w-100 float-end ">
-            <a href="note/add_checklist_note">
+            <a href="note/edit_checklist_note/0">
                 
                 <span class="material-symbols-outlined text-warning text-lg  text-lg-end m-2 float-end">checklist</span>
             </a>

@@ -147,7 +147,7 @@ class User extends Model
         if (!strlen($name) > 0) {
             $errors[] = "⚠ is required.";
         }
-        if (!(strlen($name) >= $minLength)) {
+        elseif (!(strlen($name) >= $minLength)) {
             $errors[] = "⚠must have mutch than 3 char";
         }
         return $errors;
@@ -277,9 +277,11 @@ class User extends Model
         self::execute("UPDATE users SET mail =:mail, full_name = :name WHERE id = :id ", ["mail" => $mail, "name"=>$name, "id" => $this->id]);    
     }
 
-    public function validate_title_note($title){
+    public function validate_title_note($id, $title){
         $error = [];
-        $query = self::execute("select title from notes where owner = :user_id and title = :title", ['user_id'=>$this->id, 'title'=>$title]);
+
+        $query = $id == 0 ? self::execute("select title from notes where owner = :user_id and title = :title", ['user_id'=>$this->id, 'title'=>$title]) :
+                            self::execute("select title from notes where owner = :user_id and title = :title and id != :id", ['user_id'=>$this->id, 'title'=>$title,'id' => $id]);
         $data = $query->fetchAll();
         if (count($data) != 0) {
             $error[] = "⚠already exists";

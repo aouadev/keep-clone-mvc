@@ -5,16 +5,23 @@ require_once "CheckListNoteItem.php";
 
 class CheckListNote extends Note
 {
-
-    public function get_content(): array | null
-    {
-        $query = self::execute("SELECT * FROM checklist_note_items 
-        WHere checklist_note = :id order by checked, id ", ["id" => $this->note_id]);
-        $data = $query->fetchAll();
-        return $data;
+     
+    private $content = [];
+    public function get_content(): array 
+    {   
+        if ($this->content == null) {
+            
+            $query = self::execute("SELECT * FROM checklist_note_items 
+            WHere checklist_note = :id order by checked, id ", ["id" => $this->note_id]);
+            $this->content = $query->fetchAll();
+        
+        }
+        return $this->content;
     }
 
-    public function set_content($data){}
+    public function set_content($data){
+        $this->content = $data;
+    }
 
     public function get_type(): string
     {
@@ -61,4 +68,26 @@ class CheckListNote extends Note
         self::execute("INSERT INTO `checklist_notes`(`id`) VALUES (:id)",
         ["id"=> $this->note_id]);
     }
+
+    public static function validateItems($item, $array_items) : array {
+        $errors = [];
+        $min_length = Configuration::get('item_min_length');
+        $max_length = Configuration::get('item_max_length');
+        if($item != "") {
+        if ((strlen($item) < $min_length) || (strlen($item) > $max_length)) {
+            $errors[] ="Item length must be between $min_length and $max_length char";
+        }
+    
+        $occurences = array_filter($array_items, function($e) use ($item) {
+                return $e == $item;
+        });
+        if (count($occurences) > 1) {
+            $errors[] = "Item must be unique";
+        }
+    }
+        return $errors;
+    
+        
+    }
+
 }
