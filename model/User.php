@@ -289,9 +289,9 @@ class User extends Model
         return $error;
         
     }
-    public function get_all_my_labels(int $user_id) {
-        $query = self::execute("SELECT id, label FROM notes JOIN note_labels ON 
-                                note_labels.note = notes.id WHERE owner = :owner", ["owner" => $user_id]);
+    public function get_all_my_labels() {
+        $query = self::execute("SELECT distinct label, id FROM notes JOIN note_labels ON 
+                                note_labels.note = notes.id WHERE owner = :owner ", ["owner" => $this->id]);
          return $query->fetchAll();                       
     }
 }

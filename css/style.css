@@ -1211,4 +1211,25 @@ form .add_label input {
   font-weight: 550;
   font-size: 13px;
 }
+/* Search notes with tags*/
+.search_items {
+  margin: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  
+}
+.search_form {
+  display: flex;
+  flex-wrap: wrap;
+  margin:50px 0  0 20px;
+  
+
+}
+#search_check_uncheck_icon {
+  display: flex;
+}
+.check_uncheck_label {
+  margin-left: 5px;
+}
 

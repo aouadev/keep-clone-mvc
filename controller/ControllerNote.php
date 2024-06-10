@@ -12,7 +12,7 @@ class ControllerNote extends Controller
         $user = $this->get_user_or_redirect();
         $notes_pinned = $user->get_notes_pinned();
         $notes_unpinned = $user->get_notes_unpinned();
-        $my_labels = $user->get_all_my_labels($user->id);
+        $my_labels = $user->get_all_my_labels();
    
        
         (new View("notes"))->show(["currentPage" => "my_notes", 
@@ -337,6 +337,15 @@ class ControllerNote extends Controller
 
         }
         
+    }
+    public function search() {
+        $user = $this->get_user_or_redirect();
+        $all_labels = $user->get_all_my_labels();
+
+
+        (new View('search'))->show(["currentPage" => "search", "user" => $user,"sharers" => $user->shared_by(),
+                                     'all_labels' => $all_labels]);
+
     }
 
     
