@@ -162,14 +162,14 @@ class User extends Model
     }
 
     public function get_shared_by(int $ownerid) : array {
-        return NoteShare1::get_shared_by($this->id, $ownerid);
+        return NoteShare::get_shared_by($this->id, $ownerid);
         
     }
 
 
     public function shared_by() : array {
         
-        $shared =  NoteShare1::get_shared_note($this);
+        $shared =  NoteShare::get_shared_note($this);
         $ids = [];
         foreach($shared as $shared_note) {
           $id = $shared_note->owner;
@@ -289,10 +289,56 @@ class User extends Model
         return $error;
         
     }
-    public function get_all_my_labels() {
+    public function get_all_my_labels_notes() {
         $query = self::execute("SELECT distinct label, id FROM notes JOIN note_labels ON 
                                 note_labels.note = notes.id WHERE owner = :owner ", ["owner" => $this->id]);
          return $query->fetchAll();                       
+    }
+
+    public function get_all_my_labels() {
+        $data = [];
+        $query = self::execute("SELECT distinct label FROM notes JOIN note_labels ON 
+        note_labels.note = notes.id WHERE owner = :owner ", ["owner" => $this->id]);
+        $data = $query->fetchAll(); 
+  
+        return $data;
+    }
+
+    public function search(Array $labels) {
+        $data = [];
+        foreach ($labels as $label) {
+            $query = self::execute("SELECT DISTINCT id FROM notes JOIN note_labels ON note = id WHERE owner = :owner AND label = :label", ["owner" => $this->id, "label" =>$label]);
+            $data[] = $query->fetchAll();
+        }
+        return $data;
+    }
+
+    public function filtred_notes_labels($labels, $user) {
+        $filtred_notes = [];
+        $data = [];
+        if (!empty($labels)) {
+        $labels_str = implode(',', array_map(function($label) {
+            return "'" . $label . "'";
+        }, $labels));
+    
+            $query = self::execute("SELECT distinct id, title, owner FROM notes JOIN note_labels ON id = note WHERE label IN ($labels_str) AND owner = :owner ORDER BY -weight", ["owner" => $user]);
+            $data = $query->fetchAll();
+            $content_checklist = [];
+            foreach ($data as &$row) {
+                $dataQuery = self::execute("SELECT content FROM text_notes WHERE id = :note_id", ["note_id" => $row["id"]]);
+                $content = $dataQuery->fetchColumn();
+    
+                if (!$content) {
+                    $dataQuery = self::execute("SELECT content, checked FROM checklist_note_items WHERE checklist_note = :note_id order by checked, id ", ["note_id" => $row["id"]]);
+                    $content_checklist = $dataQuery->fetchAll();
+                }
+                $row["content"] = $content;
+                $row["content_checklist"] = $content_checklist;
+            }
+            $filtred_notes[] = $data;
+        }
+        
+        return $filtred_notes;
     }
 }
 

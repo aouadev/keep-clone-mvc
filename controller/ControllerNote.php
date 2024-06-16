@@ -12,7 +12,8 @@ class ControllerNote extends Controller
         $user = $this->get_user_or_redirect();
         $notes_pinned = $user->get_notes_pinned();
         $notes_unpinned = $user->get_notes_unpinned();
-        $my_labels = $user->get_all_my_labels();
+        $my_labels = $user->get_all_my_labels_notes();
+        
    
        
         (new View("notes"))->show(["currentPage" => "my_notes", 
@@ -341,10 +342,39 @@ class ControllerNote extends Controller
     public function search() {
         $user = $this->get_user_or_redirect();
         $all_labels = $user->get_all_my_labels();
+        $data = [];
+        $my_notes = [];
+        $shared_by = [];
+     
+        
+        if (isset($_POST['check_labels'])) {
+            $data = $_POST['check_labels'];
+            $encoded_data = Tools::url_safe_encode($data);
+       
+            
+            
+       
+            
+            $this->redirect('note', "search/$encoded_data");
+        }
+        if (isset($_GET['param1'])) {
+            $decoded_data = Tools::url_safe_decode($_GET['param1']);
+            if ($decoded_data !== false) {
+                $data = $decoded_data;
+            }
+        
+        }
+        
+        $my_notes = $user->filtred_notes_labels($data, $user->id);
+        foreach($user->shared_by() as $shared_by_user) {
+            
+             $shared_by[] = NoteShare::get_shared_filtred($user->id, $shared_by_user->id, $data);
+        }
 
+ 
 
         (new View('search'))->show(["currentPage" => "search", "user" => $user,"sharers" => $user->shared_by(),
-                                     'all_labels' => $all_labels]);
+                                     'all_labels' => $all_labels, 'check_data' => $data, 'my_notes'=>$my_notes, 'shared_by'=> $shared_by]);
 
     }
 

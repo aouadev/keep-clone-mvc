@@ -166,7 +166,6 @@ abstract class Note extends Model
         $array = array_column($data, 'id');
         $index = array_search($this->note_id, $array);
         $weight_current = $this->weight; //stocker le poids courant dans une variable
-        var_dump($weight_current);
        
         if ($index + 1 < count($array)) {
             $weight_next = Note::get_note_by_id($array[$index + 1])->weight; // stocker le poids de la note suivante dans une variable

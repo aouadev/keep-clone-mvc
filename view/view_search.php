@@ -25,19 +25,74 @@
     <div class="view_notes_header">
         <h1>Search My Notes</h1>
     </div>
-    <h2>Search notes by tags :</h2> 
+    <div class="search_title_tag">Search notes by tags :</div> 
+
     <form action="note/search" method="post">
     <div class='search_form'>
       
-            <?php foreach ($all_labels as $label): ?>
+            <?php for ($i = 0; $i < Count($all_labels); $i++): ?>
                 <div class="search_items">
-                    <button class="uncheck_item_icon" id='search_check_uncheck_icon' name="search_tag" type="submit" value="<?=$label['label']?>"></button>
-                    <div class="check_uncheck_label"><?= $label['label'] ?></div>
+                    <input class="uncheck_item_icon" id='search_check_uncheck_icon' name="check_labels[]" type="checkbox" value="<?=$all_labels[$i]['label'] ?>"
+                    <?= in_array($all_labels[$i]['label'], $check_data)? 'checked' : ''; ?>/>
+                    <div class="check_uncheck_label"><?= $all_labels[$i]['label']; ?></div>
                 </div>
-            <?php endforeach; ?>
-   
+            <?php endfor; ?>
     </div>
+    <noscript>
+    <button type="submit" name="search" class="btn btn-primary m-3" value="<?=$all_labels?>">Search</button>
+
+    </noscript>
     </form>
+ 
+
+    <div class="your_notes_title"><?=count($my_notes) == 0 ? '' : 'Your notes :'?></div>
+    <div class="my_notes_labels">
+    <?php if (count($my_notes) != 0): ?>
+         
+         <?php foreach ($my_notes as $notes): ?> 
+            <?php foreach ($notes as $note_item): ?>
+             <div class="note-archivee">
+             
+                
+                     <?php include("note_in_list.php") ?>
+                 
+           
+             </div>
+             <?php endforeach;?>
+             </a>
+         <?php endforeach; ?>
+     <?php endif; ?>
+    </div>
+    <div class="search_shared">
+ 
+    <?php if(count($shared_by) != 0): ?>
+       <?php foreach($shared_by as $notes): ?>
+        <?php foreach($notes as $note_item): ?>
+     
+        
+   
+        <div>Notes shared by  <?=USER::get_user_by_id($note_item['owner'])->full_name;?> :</div>
+    
+        <div class="note-archivee">
+                   
+                            <?php include("note_in_list.php") ?>
+                        
+                 
+                  
+                    </div> 
+ 
+             <?php endforeach;?>
+             
+             <?php endforeach;?>
+         
+    
+        <?php endif; ?>
+  
+    
+    </div>
+
+
+  
    
  
           

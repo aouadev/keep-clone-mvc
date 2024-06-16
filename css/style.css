@@ -181,9 +181,9 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   margin: 5px;
-  position: absolute;
-  top: 85px;
-  left: 5px;
+  position: relative;
+  
+  margin-left: 5px;
   margin-left: 0;
 }
 
@@ -1217,12 +1217,14 @@ form .add_label input {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  position: relative;
   
 }
 .search_form {
   display: flex;
   flex-wrap: wrap;
-  margin:50px 0  0 20px;
+  position: relative;
+  margin-left: 2%;
   
 
 }
@@ -1232,4 +1234,26 @@ form .add_label input {
 .check_uncheck_label {
   margin-left: 5px;
 }
+.my_notes_labels {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: 2%;
+  
+}
+.your_notes_title {
+  position: relative;
+  margin-left: 2%;
+  
+}
+.search_shared {
+  position: relative;
+  margin-left: 2%;
+}
+.search_title_tag {
+  color: white;
+  position: relative;
+  font-size: 17px;
+  font-weight: 600;
+  margin-left: 2%;
 
+}

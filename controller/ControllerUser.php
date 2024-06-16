@@ -11,7 +11,7 @@ class ControllerUser extends Controller {
     public function my_archives() : void {
         $user = $this->get_user_or_redirect();
         $archives = $user->get_archives();
-        $my_labels = $user->get_all_my_labels($user->id);
+        $my_labels = $user->get_all_my_labels_notes($user->id);
     
         (new View("archives"))->show(["currentPage"=> "my_archives","archives"=>$archives, "sharers"=>$user->shared_by(), "my_labels" => $my_labels]);
     }
@@ -26,7 +26,7 @@ class ControllerUser extends Controller {
             $sharer = User::get_user_by_id($shared_by);
             $shared_by_name = $sharer->full_name;
             $shared_notes_by = $user->get_shared_by($shared_by);
-            $my_labels = $sharer->get_all_my_labels($sharer->id);
+            $my_labels = $sharer->get_all_my_labels_notes($sharer->id);
             foreach($shared_notes_by as $shared) {
                 if($shared["editor"] == 1)
                     $shared_notes_as_editor[] = $shared;
