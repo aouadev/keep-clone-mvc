@@ -199,7 +199,7 @@ class ControllerNote extends Controller
          
     
 
-    public function drag_and_drop() {
+  /*  public function drag_and_drop() {
         
         if(isset($_POST['arrayorder'] , $_POST['update'])) {
             $array = $_POST['arrayorder'];
@@ -213,26 +213,97 @@ class ControllerNote extends Controller
 }
     }
         
-    }
+    }*/
+    public function drag_and_drop() {
+        if (isset($_POST['update']) && $_POST['update'] === 'update') {
+            if (isset($_POST['order_pinned'])) {
+                $order_pinned = $_POST['order_pinned'];
+                if (is_array($order_pinned)) {
+                    for($i = 0; $i < count($order_pinned); $i++) {
+                        $idval = $order_pinned[$i];
+                        $current_note = Note::get_note_by_id($idval);
+                        if ($current_note->pinned == 0) {
+                        $current_note->update_pinned(1);
+                        }
+                        if ($i > 0) {
+                            $previousid = $order_pinned[$i - 1];
+                            $previeus_note = Note::get_note_by_id($previousid);
+                            if(($current_note->weight) > ($previeus_note->weight)) {
+                                $j = $i;
+                                while($current_note->weight > $previeus_note->weight && $j > 0) {
+                                    $current_note->switch_weight($previeus_note);
+                                    $previousid = $order_pinned[$j - 1];
+                                    $previeus_note = Note::get_note_by_id($previousid);
+                                    $j--;
+                                }
+                            }
+                        }
+                    }
+                    echo json_encode(['status' => 'success']);
+                    }
+                } 
+                if (isset($_POST['order_unpinned'])) {
+                    $order_unpinned = $_POST['order_unpinned'];
+                    if (is_array($order_unpinned)) {
+                        for($i = 0; $i < count($order_unpinned); $i++)  {
+                            $idval = $order_unpinned[$i];
+                            $current_note = Note::get_note_by_id($idval);
+                            if ($current_note->pinned == 1)
+                                $current_note->update_pinned(0);
+                            if ($i > 0) {
+                                $previousid = $order_unpinned[$i - 1];
+                                $previeus_note = Note::get_note_by_id($previousid);
+                                if(($current_note->weight) > ($previeus_note->weight)) {
+                                    $j = $i;
+                                    while($current_note->weight > $previeus_note->weight && $j > 0) {
+                                        $current_note->switch_weight($previeus_note);
+                                        $current_note = $previeus_note;
+                                        $previousid = $order_unpinned[$j - 1];
+                                        $previeus_note = Note::get_note_by_id($previousid);
+                                        $j--;
+                                    }
+                                }
+                            }
+                        }
+                        echo json_encode(['status' => 'success']);
+                    } 
+                }
+            } else {
+                error_log("Update parameter missing or incorrect");
+                echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
+            }
+        }
+
+    
+    
+    
+    
+    
+    
 
 
   
     // Supprimer une Note
     public function delete_note()  {
-        if (isset($_POST['delete_note'])) {
-            $note_id = $_POST['delete_note'];
+        if (isset($_GET['param1'])) {
+            $note_id = $_GET['param1'];
             $note = Note::get_note_by_id($note_id);
-        }
-        if (isset($_POST['delete_confirm'])) {
+        
+        
             $user = $this->get_user_or_redirect();
+
       
-            $note_id = $_POST['delete_confirm'];
-            $note = Note::get_note_by_id($note_id);
-            if ($user->id == $note->owner || $user->role == "admin")
+           
+            if ($user->id == $note->owner || $user->role == "admin") {
             $note->delete($user);
-               $this->redirect("user", "my_archives");
+            echo json_encode(['status' => 'success']);
+        } else {
+            // Si l'utilisateur n'est pas autorisé, renvoyez une erreur
+            echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
         }
-        (new View('confirm_delete'))->show(["note" =>$note]);
+       }
+       
+       // (new View('confirm_delete'))->show(["note" =>$note]);
     }
 
     public function open_shares() {

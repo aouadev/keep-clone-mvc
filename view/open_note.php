@@ -11,7 +11,8 @@
     <a class="back" href= <?=$back_page?>><span class="material-symbols-outlined">arrow_back_ios</span></a>
     <?php if ($archived == 1) : ?>
       <div classe="delete-archive" >  
-            <form action="note/delete_note" id="deleteForm"  method="post">
+            <form action="note/delete_note/<?= $note_id ?>" id="deleteForm"  method="post">
+            <input type="hidden" name="note_id" id="noteIdInput">
                 <button name="delete_note" class="delete" type="submit" id="delete_icon" value="<?= $note_id ?>"><span class="material-symbols-outlined">delete_forever</span></button>
                 <a class="unarchive" href="open_note/unarchive/<?= $note_id ?>"><span class="material-symbols-outlined">unarchive</span></a>
             </form>

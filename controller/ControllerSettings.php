@@ -16,10 +16,11 @@ class ControllerSettings extends Controller
     }
 
     public function edit_profile(): void {
-        $mail = '';
-        $errors = [];
-        $name = '';
         $user = $this->get_user_or_redirect();
+        $mail = $user->mail;
+        $errors = [];
+        $name = $user->full_name;
+      
         if (isset($_POST['mail']) && isset($_POST['name'])) { //&& isset($_POST['password'])) {
             $mail = $_POST['mail'];
                 if($mail != $user->mail) {

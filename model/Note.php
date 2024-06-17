@@ -247,7 +247,7 @@ abstract class Note extends Model
             self::execute("UPDATE text_notes SET content = :content WHERE id = :id", ['id'=>$this->note_id, 'content'=>$this->get_content()]);
         }
         else {
-            echo "coucou";
+
            // var_dump($this->get_content() );
           //  $query = self::execute("SELECT content FROM checklist_note_items WHERE checklist_note = : id", ['id' => $this->note_id]);
         
@@ -422,10 +422,6 @@ abstract class Note extends Model
                 );
         }
     }
-    public static function update_drag_and_drop($count, $idval)
-    {
-        self::execute("UPDATE notes SET weight = :count, WHERE id = :id", ['count' => $count, 'id' => $idval]);
-    }
     public function share_note(User $user, int $editor) {
         self::execute("INSERT INTO note_shares(note, user, editor) VALUES (:note, :user, :editor)", ["note" =>$this->note_id, "user"=>$user->id, "editor"=>$editor]);
     }
@@ -558,9 +554,23 @@ abstract class Note extends Model
     
     }
    
- 
+ // drag and drop
+ public function update_pinned(int $pinned) : void{
+    self::execute("UPDATE notes SET pinned = :val WHERE id = :id", ["val"=>$pinned, "id"=> $this->note_id] );
+ }
+ public function switch_weight(Note $previous) : void {
+    $current_weight = $this->weight; //stocker le poids courant dans une variable
+       
+    
+        $previous_weight = $previous->weight; // stocker le poids de la note précédente dans une variable
+        self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" => 0,"id" => $previous->note_id]); // donner des poids temporaire qui peuvent pas exister dans une autre note(négatif ou null)
+        self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" => -1,"id" => $this->note_id]);
+        self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" => $current_weight,"id" => $previous->note_id]); // switcher le poids entre les deux notes sans contradiction avec la contrainte du 1poids/user
+        self::execute("UPDATE notes SET weight = :val  WHERE id = :id", ["val" => $previous_weight,"id" => $this->note_id]);
+    }
+ }
 
     
 
  
-}
+
