@@ -9,8 +9,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
+    <script src="lib/jquery-3.7.1.min.js" type="text/javascript"></script>
     <link href="css/style.css" rel="stylesheet" type="text/css" />
-    <script src="JS/edit_errors.js" ></script>
+    <script src="JS/edit_note.js" ></script>
+    <script>
+    const minLength = <?=Configuration::get('title_min_length'); ?>;
+    const maxLength = <?=Configuration::get('title_max_length'); ?>;
+  
+    </script>
 </head>
 <body>
     <form method="post" action="note/edit_checklist_note/<?= $id?>">
@@ -33,6 +39,7 @@
             <?php endif; ?>
         </div>
         <label for="content" class="note_body_title">Items</label>
+        <!--ajouter une nouvelle checklist note -->
         <?php if($id == 0): ?>
             <ul class="add_cn">
             <?php $val = count($content) == 0 ? 5 : count($content); ?>
@@ -51,7 +58,8 @@
                         </div>
                     <?php endfor; ?>
             </ul>
-        <?php else : ?>
+            <!--editer une checklist note existante-->
+        <?php else : ?> 
                     <div class="edit_cn">
                     <?php for($i = 0;$i < count($content); $i++) : ?>
                    
@@ -63,7 +71,7 @@
                                 <div class="uncheck_item_icon"></div>
                             <?php endif; ?>
                         </div>
-                        <input type="text"  class="item_edit" id=<?=$content[$i]['checked'] ? 'content_checked' : 'content_unchecked'?> name='content[]' value="<?= $content[$i]['content'] ?>">
+                        <input type="text"  class="item_edit <?=$content[$i]['checked'] ? 'content_checked' : 'content_unchecked'?> " id="content" name='content[]' value="<?= $content[$i]['content'] ?>">
                         <button name="delete_item"class="btn btn-danger btn-delete-label" value="<?=$content[$i]['id']?>" type="submit">-</button>
                     </div>
                     <div class="error_add_cn_note">
@@ -86,6 +94,9 @@
                         <input class="btn btn-primary btn-plus" value="+" type="submit">
                     </div>
                 </div>
+                <div class="errors">
+                    <?=$item_content_error?>
+                </div>
                     </div>
                     </div>
               
@@ -94,10 +105,10 @@
       
     </form>
     <script>
-    var userId = <?= json_encode($note->owner); ?>;
+    var userId = <?= json_encode($content); ?>;
     console.log(userId); // Pour vérifier que la valeur est correctement passée
     </script>
-    <script src="JS/edit_errors.js"></script>
+
 
 </body>
 </html>

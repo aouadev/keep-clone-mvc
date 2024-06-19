@@ -77,6 +77,10 @@ class ControllerNote extends Controller
             
   
             $errors = $user->validate_name($title); 
+           /* if (!($user->validate_title_note($id, $title))){
+                $errors[] = "⚠already exists";
+            }*/
+
             $errors = array_merge($errors, $user->validate_title_note($id, $title));
             if(empty($errors) ) {
                 if($id == 0) {
@@ -102,6 +106,8 @@ class ControllerNote extends Controller
     public function edit_checklist_note() : void {
         $title_errors = [];
         $items_errors = [];
+        $item_content_error = '';
+        $item_content = "";
         if (isset($_GET['param1']) && $_GET['param1'] !== "" ) {
             $id = $_GET['param1'];
             if ($id != 0) {
@@ -126,22 +132,29 @@ class ControllerNote extends Controller
             }
             $title_errors = $user->validate_name($title); 
             $title_errors = array_merge($title_errors, $user->validate_title_note($id, $title));
-            if (isset($_POST['item_content']) && $_POST['item_content'] != '' && count($title_errors) == 0) {
+            //pour ajouter un nouveau item quand on édite la checklist note
+            if (isset($_POST['item_content']) && $_POST['item_content'] != '' && count($title_errors) == 0) { 
                 $item_content = $_POST['item_content'];
-                $note->add_item($id, $item_content);
-                $this->redirect("note", "edit_checklist_note/$id");
+                //vérifier l'unicité du nouveau item
+                if (in_array($item_content, $new_content)) 
+                    $item_content_error = "Item must be unique"; 
+                if ($item_content_error == "") {
+                    $note->add_item($id, $item_content);
+                    $this->redirect("note", "edit_checklist_note/$id");
+                }
             }
+            // pour supprimer un item pendant le edit checklist note 
             if (isset($_POST['delete_item']) && count($title_errors) == 0) {
                 $item_id = $_POST['delete_item'];
                 $note->delete_item($item_id);
                 $this->redirect("note", "edit_checklist_note/$id");
             }
-
+            // vérifier l'unicité des items 
             for($i = 0; $i < count($new_content); $i++) {
                 $items_errors[$i] = CheckListNote::validateItems($new_content[$i], $new_content);
             }
         
-            if(empty($title_errors) && $this->allEmpty($items_errors) ) {
+            if(empty($title_errors) && $this->allEmpty($items_errors) && $item_content_error == "") {
             
                 if($id == 0) {
                     $note = new CheckListNote($title, $user->id, Date("Y-m-d H:i:s"));
@@ -160,7 +173,7 @@ class ControllerNote extends Controller
         } 
     }
     (new view("add_checklist_note"))->show(["title_errors"=> $title_errors,"items_errors" => $items_errors, 
-                                                 'title' =>$title, 'content' => $content, 'id' => $id, 'item_content'=>'']);
+                                                 'title' =>$title, 'content' => $content, 'id' => $id, 'item_content'=>$item_content, 'item_content_error' =>$item_content_error]);
                                                 }
 
     public static function allEmpty($array) {
@@ -296,7 +309,9 @@ class ControllerNote extends Controller
            
             if ($user->id == $note->owner || $user->role == "admin") {
             $note->delete($user);
+          
             echo json_encode(['status' => 'success']);
+            $this->redirect("user", "my_archives");
         } else {
             // Si l'utilisateur n'est pas autorisé, renvoyez une erreur
             echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
@@ -448,6 +463,23 @@ class ControllerNote extends Controller
                                      'all_labels' => $all_labels, 'check_data' => $data, 'my_notes'=>$my_notes, 'shared_by'=> $shared_by]);
 
     }
+
+
+    //valider l'unicité du titre de la note pour js
+     public function title_note_exists() : void {
+        $res = "false";
+        if (isset ($_GET['param1']) && $_GET['param1'] !== ""
+            && isset($_GET['param2']) && $_GET['param2'] !== "") {
+                $user = $this->get_user_or_redirect();
+                $error = $user->validate_title_note($_GET['param1'], $_GET['param2']);
+                if (!empty($error)) {
+                     $res = "true";
+                }
+                   
+            }
+            echo $res;
+
+     }
 
     
     

@@ -1,6 +1,6 @@
 $(document).ready(function () {
 
-    const modal = new bootstrap.Modal(document.getElementById('confirmationDelete'));
+    const modal = new bootstrap.Modal($('#confirmationDelete')[0]);
     const confirmExitButton = $('#confirmExitButton');
     const backButton = $('.back'); 
 
@@ -16,7 +16,11 @@ $(document).ready(function () {
             type: 'POST', 
             data: $('#deleteForm').serialize(), 
             success: function (response) {
-                console.log("success"); 
+                modal.hide();
+                $('#confirmationDelete').on('hidden.bs.modal', function () {
+                    const confirm = new bootstrap.Modal($("#isDeleted")[0]);
+                    confirm.show();
+                }); 
             },
             error: function (xhr, status, error) {
             

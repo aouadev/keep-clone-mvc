@@ -132,9 +132,10 @@ body{
 }
 
 .errors {
-  color: red;
+  color:rgb(255, 0, 81);
   font-weight: 300;
   font-size: 15px;
+  
 }
 
 .errors li {
@@ -649,7 +650,7 @@ nav a {
 
 .note_body_text {
     color : lightgray;
-    position: absolute;
+    position: relative;
     
     top: 230px;
     left: 3%;
@@ -664,7 +665,7 @@ nav a {
 }
 .add_text_note {
   background-color: transparent;
-  position: absolute;
+  position: relative;
   left: 3%;
   padding: 15px;
   width: 94%;
@@ -672,9 +673,12 @@ nav a {
   color : lightgray;
   top: 230px;
   height: 500px;
-    
+}
+#errDescription {
+  position: absolute;
+  left: 3%;
+  top: 750px;
   
-
 }
 
 /*error edit and add text_note*/
@@ -901,6 +905,7 @@ input:focus, textarea:focus {
   left: 4%;
 
 }
+
 
 
 .edit_checklist_form {

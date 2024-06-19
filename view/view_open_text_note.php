@@ -27,6 +27,7 @@
  
     </div>
     <?php include("view/view_modal_delete.php"); ?>
+  
 
     <script src="JS/confirmation_delete.js"></script>
 
