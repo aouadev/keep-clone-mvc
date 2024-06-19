@@ -107,6 +107,7 @@ class ControllerNote extends Controller
         $title_errors = [];
         $items_errors = [];
         $item_content_error = '';
+        $error_empty_items = "";
         $item_content = "";
         if (isset($_GET['param1']) && $_GET['param1'] !== "" ) {
             $id = $_GET['param1'];
@@ -153,8 +154,12 @@ class ControllerNote extends Controller
             for($i = 0; $i < count($new_content); $i++) {
                 $items_errors[$i] = CheckListNote::validateItems($new_content[$i], $new_content);
             }
+            $error_empty_items = $this->allEmpty($new_content) ? "at least one " : "";
+            var_dump($error_empty_items);
+            var_dump($this->allEmpty($new_content));
+           
         
-            if(empty($title_errors) && $this->allEmpty($items_errors) && $item_content_error == "") {
+            if(empty($title_errors) && $this->allEmpty($items_errors) && $item_content_error == "" && $error_empty_items = "") {
             
                 if($id == 0) {
                     $note = new CheckListNote($title, $user->id, Date("Y-m-d H:i:s"));
@@ -168,12 +173,14 @@ class ControllerNote extends Controller
                 }
                 $note->set_content($content);
                 $note->persist();
-            $this->redirect("open_note", "index/$note->note_id");
+           $this->redirect("open_note", "index/$note->note_id");
             }
-        } 
+        }
+        var_dump($error_empty_items); 
     }
     (new view("add_checklist_note"))->show(["title_errors"=> $title_errors,"items_errors" => $items_errors, 
-                                                 'title' =>$title, 'content' => $content, 'id' => $id, 'item_content'=>$item_content, 'item_content_error' =>$item_content_error]);
+                                                 'title' =>$title, 'content' => $content, 'id' => $id, 'item_content'=>$item_content,
+                                                  'item_content_error' =>$item_content_error, 'itemless' => $error_empty_items]);
                                                 }
 
     public static function allEmpty($array) {

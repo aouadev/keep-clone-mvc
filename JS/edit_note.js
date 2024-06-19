@@ -1,5 +1,7 @@
 
-let title, errTitle, item_content, description, errDescription;
+let title, errTitle,description, errDescription, errItem, itemContent, items;
+
+
     
 function checkTitle() {
     let ok = true;
@@ -19,8 +21,9 @@ return ok;
 }
 function checkAll() {
     let ok = checkTitle();
-    ok = checkTitleExists() && ok;
-    ok = checkTextContent() && ok;
+    ok = ok && checkTitleExists(); // car le and est une évaluation parresseuse 
+    ok = ok && checkTextContent(); // pour ne pas appeler les méthodes si ok est false
+    ok = ok && errItem.val() == "";
     return ok;
 }
 
@@ -35,25 +38,60 @@ function checkTextContent() {
 }
 
 
-async function checkTitleExists() {
 
-let ok = true;
-const data = await $.getJSON("note/title_note_exists/" + 0 + "/" + title.val());
-if (data) {
-    errTitle.append("<p>⚠already exists.</p>");
-    ok = false;
+function checkUnicityItem() {
+    errItem.html(""); // Clear previous errors
+    let currentItemText = $(this).val();
+    let isDuplicate = false;
+    //console.log(currentItemText);
+   for (let i = 0; i < itemContent.length; i++) {
+
+    let currentValue = $(itemContent[i]).val();
+
+  
+    if (currentValue === currentItemText && itemContent[i] !== $(this)[0]) {
+        isDuplicate = true;
+        return false;
+    }
+}
+
+    if (isDuplicate) {
+        console.log("duplicate");
+        errItem.append("<p>⚠ Item already exists.</p>");
+    } else {
+        console.log("add");
+    
+        items.push(currentItemText);
+        
+    }
+}
+
+
+async function checkTitleExists() {
+    let ok = true;
+    const data = await $.getJSON("note/title_note_exists/" + id + "/" + title.val());
+    if (data) {
+        errTitle.append("<p>⚠already exists.</p>");
+        ok = false;
 }
 return ok;
 }
 $(function() {
-title = $("#title");
-errTitle = $("#titleError");
-item_content = $("#content");
-description = $("#description");
-errDescription = $("#errDescription");
-btnSave = $("#saveButton");
-title.bind("input", checkTitle);
-title.bind("input", checkTitleExists);
-description.bind("input", checkTextContent);
-$("input:text:first").focus();
+    items = $("ul");
+    title = $("#title");
+    errTitle = $("#titleError");
+    description = $("#description");
+    errDescription = $("#errDescription");
+    btnSave = $("#saveButton");
+    errItem = $("#errItem");
+   
+    itemContent = $("li input");
+    console.log(items);
+    console.log(itemContent);
+    itemContent.bind("input", checkUnicityItem);
+    title.bind("input", checkTitle);
+    title.bind("input", checkTitleExists);
+    description.bind("input", checkTextContent);
+    $("input[name='content[]']").bind("input", checkItemUniqueness);
+    $("input:text:first").focus();
 });

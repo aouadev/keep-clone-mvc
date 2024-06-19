@@ -17,9 +17,14 @@
     const maxLength = <?=Configuration::get('title_max_length'); ?>;
   
     </script>
+      <script>
+    let content = <?= json_encode($content); ?>;
+ 
+    let id = <?= json_encode($id); ?>
+    </script>
 </head>
 <body>
-    <form method="post" action="note/edit_checklist_note/<?= $id?>">
+    <form method="post" action="note/edit_checklist_note/<?= $id?>" onsubmit="return checkAll();">
         <div class="edit">
             <a class="back" href="note/index"><span class="material-symbols-outlined">arrow_back_ios</span></a>
             <input class="material-symbols-outlined save" type="submit" id="saveButton" value='save'>
@@ -27,6 +32,7 @@
         <label for="title" class="title_note_title">Title</label>
         <input type="text" class="title_edit_note form-control title_add <?= (!empty($title_errors) ? "border border-danger" :
          (isset($_POST["title"]) && !empty($_POST["title"]) ? "border border-success" : "")) ?>" id="title" name="title" value="<?= $title ?>">
+        <div id="titleError" class="errors"></div>
         <div class="error_add_note_php">
             <?php if (count($title_errors) != 0): ?>
                 <div class="errors">
@@ -44,7 +50,9 @@
             <ul class="add_cn">
             <?php $val = count($content) == 0 ? 5 : count($content); ?>
                 <?php for($i = 0;$i < 5; $i++) : ?>
-                    <li> <input type="text" class="item_new" id="content" name="content[]" value="<?= count($content) == 0 ? '' : $content[$i]['content']?>"></li>
+                    <li> <input type="text" class="item_new" id="item_content" 
+                    name="content[]" value="<?= count($content) == 0 ? '' : $content[$i]['content']?>"> <div id="errItem" class="errors"></div></li>
+                   
                         <div class="error_add_cn_note">
                             <?php if (count($items_errors) != 0): ?>
                                 <div class="errors">
@@ -58,6 +66,8 @@
                         </div>
                     <?php endfor; ?>
             </ul>
+            <?=var_dump($itemless)?>
+            <div class="errors" id="error_items_empty"><?=$itemless?></div>
             <!--editer une checklist note existante-->
         <?php else : ?> 
                     <div class="edit_cn">
@@ -71,7 +81,9 @@
                                 <div class="uncheck_item_icon"></div>
                             <?php endif; ?>
                         </div>
-                        <input type="text"  class="item_edit <?=$content[$i]['checked'] ? 'content_checked' : 'content_unchecked'?> " id="content" name='content[]' value="<?= $content[$i]['content'] ?>">
+                        <input type="text"  class="item_edit <?=$content[$i]['checked'] ? 'content_checked' : 
+                        'content_unchecked'?> " id="item_content" name='content[]' value="<?= $content[$i]['content'] ?>">
+                        <div id="errItem" class="errors"></div>
                         <button name="delete_item"class="btn btn-danger btn-delete-label" value="<?=$content[$i]['id']?>" type="submit">-</button>
                     </div>
                     <div class="error_add_cn_note">
@@ -104,10 +116,7 @@
                 <?php endif; ?>
       
     </form>
-    <script>
-    var userId = <?= json_encode($content); ?>;
-    console.log(userId); // Pour vérifier que la valeur est correctement passée
-    </script>
+  
 
 
 </body>

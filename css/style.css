@@ -814,15 +814,21 @@ input:focus, textarea:focus {
 }
 
 .title_edit_note {
+  background: transparent;
   position: absolute;
   top: 125px;
   left: 3%;
   color: lightgray;
-  background-color: transparent;
+
   width: 94%;
   padding: 7px 7px 7px 10px;
   border: 1.7px solid #494c51;
   border-radius: 7px;
+}
+.title_add {
+  background: transparent;
+  color: lightgrey;
+
 }
 .add_cn, .edit_cn{
   position: absolute;
@@ -1017,11 +1023,7 @@ input:focus, textarea:focus {
   color: lightgrey;
 }
 
-.title_add {
-  background: transparent;
-  color: lightgrey;
 
-}
 
 .title_add:focus {
 
@@ -1261,4 +1263,7 @@ form .add_label input {
   font-weight: 600;
   margin-left: 2%;
 
+}
+#error_item_empty {
+  background: #0652DD;
 }

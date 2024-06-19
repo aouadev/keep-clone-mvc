@@ -28,7 +28,8 @@
         </div>
      
         <label for="title" class="title_note_title">Title</label>
-        <input type="text" class="title_edit_note form-control title_add <?= (!empty($errors) ? "border border-danger" : (isset($_POST["title"]) && !empty($_POST["title"]) ? "border border-success" : "")) ?>" id="title" name="title" value="<?= $title ?>">
+        <input type="text" class="title_edit_note form-control title_add <?= (!empty($errors) ? "border border-danger" :
+         (isset($_POST["title"]) && !empty($_POST["title"]) ? "border border-success" : "")) ?>" id="title" name="title" value="<?= $title ?>">
         <div id="titleError" class="errors"></div>
         <div class="error_add_note_php">
             <?php if (count($errors) != 0): ?>
@@ -47,6 +48,11 @@
         <div id="errDescription" class="errors"></div>
         
     </form>
+    <script>
+    let content = <?= json_encode($content); ?>;
+    console.log(content); 
+    let id = <?= json_encode($id); ?>
+    </script>
 
 
 
