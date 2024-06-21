@@ -11,6 +11,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
+    <script src="lib/jquery.ui.touch-punch.js" type="text/javascript"></script>
+ 
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="css/style.css" rel="stylesheet" type="text/css">
     <script>
@@ -69,7 +72,7 @@
                 <?php for ($i = 0; $i < count($notes_pinned); $i++) { ?>
                     <div id="<?= $notes_pinned[$i]["id"]; ?>" class="note .bg-success">
                         <a class="link-note-archivee" href='open_note/index/<?= $notes_pinned[$i]["id"]; ?>/<?=$back?>/0'>
-                            <p class="note-title"><?= $notes_pinned[$i]["title"]; ?> weight: <?=Note::get_note_by_id($notes_pinned[$i]['id'])->weight?> id: <?= $notes_pinned[$i]["id"]; ?></p>
+                            <p class="note-title"><?= $notes_pinned[$i]["title"]; ?></p>
                             
                          
                                 <?php if ($notes_pinned[$i]["content"] && $notes_pinned[$i]["content"] !== "") : ?>
@@ -131,7 +134,7 @@
                 <?php for ($i = 0; $i < count($notes_unpinned); $i++) { ?>
                     <div id="<?= $notes_unpinned[$i]["id"]; ?>" class="note">
                         <a class="link-note-archivee" href='open_note/index/<?= $notes_unpinned[$i]["id"]; ?>/<?=$back?>/0'>
-                            <p class="note-title"><?= $notes_unpinned[$i]["title"];?>  weight : <?=Note::get_note_by_id($notes_unpinned[$i]['id'])->weight?> id: <?= $notes_unpinned[$i]["id"]; ?></p>
+                            <p class="note-title"><?= $notes_unpinned[$i]["title"];?></p>
                          
                         
                                 <?php if ($notes_unpinned[$i]["content"] && !empty($notes_unpinned[$i]["content"])): ?>

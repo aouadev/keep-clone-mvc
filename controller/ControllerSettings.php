@@ -66,6 +66,7 @@ class ControllerSettings extends Controller
                         $user->setPassword($newPassword);
                         $user->updatePassword($newPassword);
                         $successMessage = "Password changed successfully!";
+                        $this->redirect("settings", "settings");
                     } catch (Exception $e) {
                         $errors[] = "Erreur lors de la mise à jour du mot de passe : " . $e->getMessage();
                     }

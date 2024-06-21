@@ -129,7 +129,7 @@ function inContents() {
 }
 
 function updateSaveButtonState() {
-    isValid = checkTitleExists() && checkTitle() && checkItemsValidations();
+    isValid = checkTitle() && checkItemsValidations();
     saveButton.prop('disabled', !isValid);
 }
 function updateBtnAddItem() {
@@ -172,6 +172,7 @@ $(function() {
         checkTitle();
         updateSaveButtonState();
     });
+    title.bind('blur', checkTitleExists);
 
     itemContent.on("input", function() {
         checkItemsValidations();

@@ -418,28 +418,25 @@ class ControllerNote extends Controller
         $user = $this->get_user_or_redirect();
         $all_labels = $user->get_all_my_labels();
         $data = [];
+        $encoded_data = "";
         $my_notes = [];
         $shared_by = [];
-     
-        
         if (isset($_POST['check_labels'])) {
-            
             $data = $_POST['check_labels'];
-          
             $encoded_data = Tools::url_safe_encode($data);
             $this->redirect('note', "search/$encoded_data");
         }
         if (isset($_GET['param1'])) {
+            $encoded_data = $_GET['param1'];
             $decoded_data = Tools::url_safe_decode($_GET['param1']);
             if ($decoded_data !== false) {
                 $data = $decoded_data;
-                var_dump($data);
+                
             }
         
         }
         
         $my_notes = $user->filtred_notes_labels($data, $user->id);
-        var_dump($my_notes);
         foreach($user->shared_by() as $shared_by_user) {
             
              $shared_by[] = NoteShare::get_shared_filtred($user->id, $shared_by_user->id, $data);
@@ -448,9 +445,25 @@ class ControllerNote extends Controller
  
 
         (new View('search'))->show(["currentPage" => "search", "user" => $user,"sharers" => $user->shared_by(),
-                                     'all_labels' => $all_labels, 'check_data' => $data, 'my_notes'=>$my_notes, 'shared_by'=> $shared_by]);
+                                     'all_labels' => $all_labels, 'check_data' => $data, 'my_notes'=>$my_notes, 'shared_by'=> $shared_by,
+                                      "encoded_data"=>$encoded_data]);
 
     }
+
+    public function get_my_filtred_notes_service() : void {
+        $user = $this->get_user_or_redirect();
+        
+        if (isset($_GET['param1']) && $_GET['param1'] !== "") {
+            $encoded_data = $_GET['param1'];
+            $decoded_data = json_decode($encoded_data);
+             $my_notes = $user->filtred_notes_labels($decoded_data, $user->id);
+            $my_notes_as_json = json_encode($my_notes);
+            echo $my_notes_as_json;
+        } else {
+            echo json_encode([]);
+        }
+    }
+    
 
 
     //valider l'unicité du titre de la note pour js

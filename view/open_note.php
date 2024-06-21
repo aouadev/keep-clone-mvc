@@ -4,8 +4,13 @@
         <?php $back_page = "note/index" ?>
     <?php elseif($back == "back_archives"): ?>
         <?php $back_page = "user/my_archives" ?>
-    <?php elseif ($back == "back_shared_by"):?>
-        <?php $back_page= "user/get_shared_by/$param3" ?> 
+    <?php elseif (strpos($back, "back_shared_by_") === 0 ): ?>
+        <?php $sharer_id = (int)str_replace("back_shared_by_", "", $back);?>
+        <?php $back_page = "user/get_shared_by/$sharer_id" ?>
+    <?php endif; ?>
+    <?php if (strpos($back, "search_") === 0 ):?>
+        <?php $encoded_data = str_replace("search_", "", $back); ?>
+        <?php $back_page = "note/search/$encoded_data"; ?>
 
     <?php endif; ?>       
     <a class="back" href= <?=$back_page?>><span class="material-symbols-outlined">arrow_back_ios</span></a>

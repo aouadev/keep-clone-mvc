@@ -15,6 +15,45 @@
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="css/style.css" rel="stylesheet" type="text/css">
+    <script>
+        
+        let labels, notes, decodedLabels, checkedLabels, checked; 
+        $(function() {
+            labels =  $("input[name='check_labels[]']");
+            notes = $("notes");
+           
+           labels.click(function() {
+            checkedLabels = labels.filter(":checked").map(function() {
+                return $(this).val();
+            }).get();
+            console.log("Checked labels:", checkedLabels);
+ 
+
+           
+             getNotes(checkedLabels);
+        
+
+            });
+             
+        
+        });
+        async function getNotes(labels) {
+            
+          
+          try {
+            let encodedLabels = json_encode(labels);
+            console.log(encodedLabels);
+        
+              myNotes = await $.getJSON("note/get_my_filtred_notes_service/" + encodedLabels);
+              $("notes").html(myNotes);
+              console.log("my notes:", myNotes);
+
+          }catch(e) {
+              $("notes").html("<tr><td>Error encountered while retrieving the notes!</td></tr>");
+          }
+      }
+ 
+    </script>
 
 </head>
 
@@ -45,20 +84,18 @@
     </form>
  
 
-    <div class="your_notes_title"><?=count($my_notes) == 0 ? '' : 'Your notes :'?></div>
+    <div class="your_notes_title" id="notes"><?=count($my_notes) == 0 ? '' : 'Your notes :'?></div>
    
     <div class="my_notes_labels">
     <?php if (count($my_notes) != 0): ?>
          
          <?php foreach ($my_notes as $notes): ?> 
             <?php foreach ($notes as $note_item): ?>
+            <?php $back = "search_$encoded_data"?>
+        <a class="link-note-archivee" href="open_note/index/<?=$note_item["id"]?>/<?=$back ?>"> 
              <div class="note-archivee">
-             
-                
-                     <?php include("note_in_list.php") ?>
-                 
-           
-             </div>
+                <?php include("note_in_list.php") ?>
+            </div>
              <?php endforeach;?>
              </a>
          <?php endforeach; ?>
@@ -69,22 +106,15 @@
     <?php if(count($shared_by) != 0): ?>
        <?php foreach($shared_by as $notes): ?>
         <?php foreach($notes as $note_item): ?>
-     
-        
-   
-        <div>Notes shared by  <?=USER::get_user_by_id($note_item['owner'])->full_name;?> :</div>
-    
-        <div class="note-archivee">
-                   
-                            <?php include("note_in_list.php") ?>
-                        
-                 
-                  
-                    </div> 
- 
-             <?php endforeach;?>
-             
-             <?php endforeach;?>
+            <div>Notes shared by  <?=USER::get_user_by_id($note_item['owner'])->full_name;?> :</div>
+            <?php $back = "search_$encoded_data"?>
+            <a class="link-note-archivee" href="open_note/index/<?=$note_item["id"]?>/<?=$back ?>"> 
+            <div class="note-archivee">
+                <?php include("note_in_list.php") ?>
+            </div>
+        <?php endforeach;?>
+        </a>
+        <?php endforeach;?>
          
     
         <?php endif; ?>

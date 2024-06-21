@@ -48,7 +48,7 @@ function checkTextContent() {
 
 
 function updateSaveButtonState() {
-    isValid = checkTitleExists() && checkTitle() && checkTextContent();
+    isValid = checkTitle() && checkTextContent();
     saveButton.prop('disabled', !isValid);
 }
 
@@ -79,6 +79,7 @@ $(function() {
         checkTitle();
         updateSaveButtonState();
     });
+    title.bind('blur', checkTitleExists);
   
     description.on("input", function() {
         checkTextContent();
