@@ -27,10 +27,7 @@
                 return $(this).val();
             }).get();
             console.log("Checked labels:", checkedLabels);
- 
-
-           
-             getNotes(checkedLabels);
+                getNotes(checkedLabels);
         
 
             });

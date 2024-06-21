@@ -19,11 +19,11 @@ class ControllerOpen_note extends Controller
             $body = $note->get_content();
             $type = $note->get_type();
             $previous = "";
-         
-             
-            
-       
-            
+            if (isset($_GET["param2"])) {
+                $previous = $_GET["param2"];
+                
+            }
+    
         }
         ($note->get_type() == "tn" ? new View("open_text_note") : new View("open_checklist_note"))->show([
             "note" => $note, "note_id" => $note_id, "get_time" => $this->get_time($note_id), "edited" => $this->get_edited_time($note_id),
