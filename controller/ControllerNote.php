@@ -76,7 +76,7 @@ class ControllerNote extends Controller
             $content = $_POST['content'];
             
   
-            $errors = $user->validate_name($title);        
+            $errors = $user->validate_title($title);        
 
             $errors = array_merge($errors, $user->validate_title_note($id, $title));
             if(empty($errors) ) {
@@ -126,7 +126,7 @@ class ControllerNote extends Controller
             for($i = 0; $i < count($new_content); $i++) {
                 $content[$i]['content'] = $new_content[$i];
             }
-            $title_errors = $user->validate_name($title); 
+            $title_errors = $user->validate_title($title); 
             $title_errors = array_merge($title_errors, $user->validate_title_note($id, $title));
         
             // vérifier l'unicité des items 
@@ -295,6 +295,22 @@ class ControllerNote extends Controller
        }
        
        // (new View('confirm_delete'))->show(["note" =>$note]);
+    }
+    
+    public function delete_note_php()  {
+        if (isset($_GET['param1'])) {
+            $note_id = $_GET['param1'];
+            $note = Note::get_note_by_id($note_id);
+             $user = $this->get_user_or_redirect();
+        }
+        if (isset($_POST['delete_confirm'])) {
+            $user = $this->get_user_or_redirect();
+            $note_id = $_POST['delete_confirm'];
+            $note = Note::get_note_by_id($note_id);
+            $note->delete($user);
+               $this->redirect("user", "my_archives");
+        }
+        (new View('confirm_delete'))->show(["note" =>$note]);
     }
 
     public function open_shares() {

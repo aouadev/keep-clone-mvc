@@ -19,12 +19,7 @@ class ControllerOpen_note extends Controller
             $body = $note->get_content();
             $type = $note->get_type();
             $previous = "";
-            $param3 = "";
-            if (isset($_GET["param2"])) {
-                $previous = $_GET["param2"];
-                
-            }
-            $param3 =  (isset($_GET['param3'])) ?  $_GET['param3'] : "0";
+         
              
             
        
@@ -33,7 +28,7 @@ class ControllerOpen_note extends Controller
         ($note->get_type() == "tn" ? new View("open_text_note") : new View("open_checklist_note"))->show([
             "note" => $note, "note_id" => $note_id, "get_time" => $this->get_time($note_id), "edited" => $this->get_edited_time($note_id),
              "archived" => $archived, "isShared_as_editor" => $isShared_as_editor, "isShared_as_reader" => $isShared_as_reader, "note_body" => $body,
-             "pinned" => $pinned, "user_id" => $user_id, "as_editor" => $as_editor, "back" => $previous, "param3" => $param3, 'type'=>$type
+             "pinned" => $pinned, "user_id" => $user_id, "as_editor" => $as_editor, "back" => $previous, 'type'=>$type
         ]);
     }
 

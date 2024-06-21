@@ -152,6 +152,22 @@ class User extends Model
         }
         return $errors;
     }
+    public function validate_title(string $title): array
+    {
+        $minLength = Configuration::get('title_min_length');
+        $maxLength = Configuration::get('title_max_length');
+        $errors = [];
+        if (!strlen($title) > 0) {
+            $errors[] = "⚠ is required.";
+        }
+        elseif (!(strlen($title) >= $minLength)) {
+            $errors[] = "⚠title must have mutch than $minLength char";
+        }
+        elseif ((strlen($title) > $maxLength)) {
+            $errors[] = "⚠title must have less than $maxLength char";
+        }
+        return $errors;
+    }
 
 
 

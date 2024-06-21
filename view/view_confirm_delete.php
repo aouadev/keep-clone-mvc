@@ -17,7 +17,7 @@
     <div class="title"><span class="material-symbols-outlined">delete_forever</span> <p> Are you sure ?</p></div>
     <p class="txt_confirm_delete">Do you really want to delete note <strong>"<?=$note->title?>" </strong> all of its dependencires ? </p>
     <p class="txt_confirm_delete">This process cannot be undone.</p>
-    <form action="note/delete_note" method="post">
+    <form action="note/delete_note_php" method="post">
     <div class="btn_confirm_delete" >
        
         <a href="open_note/index/<?=$note->note_id?>" type="button" class="btn btn-secondary">Cancel</a>

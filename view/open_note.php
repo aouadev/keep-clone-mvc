@@ -22,6 +22,15 @@
                 <a class="unarchive" href="open_note/unarchive/<?= $note_id ?>"><span class="material-symbols-outlined">unarchive</span></a>
             </form>
       </div>
+      <noscript>
+      <div classe="delete-archive" >  
+            <form action="note/delete_note_php/<?= $note_id ?>" id="deleteForm"  method="post">
+            <input type="hidden" name="note_id" id="noteIdInput">
+                <button name="delete_note" class="delete" type="submit" id="delete_icon" value="<?= $note_id ?>"><span class="material-symbols-outlined">delete_forever</span></button>
+                <a class="unarchive" href="open_note/unarchive/<?= $note_id ?>"><span class="material-symbols-outlined">unarchive</span></a>
+            </form>
+      </div>
+      </noscript>
         
 
 
