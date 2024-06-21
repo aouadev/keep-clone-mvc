@@ -147,8 +147,24 @@ class User extends Model
         if (!strlen($name) > 0) {
             $errors[] = "⚠ is required.";
         }
-        if (!(strlen($name) >= $minLength)) {
+        elseif (!(strlen($name) >= $minLength)) {
             $errors[] = "⚠must have mutch than 3 char";
+        }
+        return $errors;
+    }
+    public function validate_title(string $title): array
+    {
+        $minLength = Configuration::get('title_min_length');
+        $maxLength = Configuration::get('title_max_length');
+        $errors = [];
+        if (!strlen($title) > 0) {
+            $errors[] = "⚠ is required.";
+        }
+        elseif (!(strlen($title) >= $minLength)) {
+            $errors[] = "⚠title must have mutch than $minLength char";
+        }
+        elseif ((strlen($title) > $maxLength)) {
+            $errors[] = "⚠title must have less than $maxLength char";
         }
         return $errors;
     }
@@ -162,14 +178,14 @@ class User extends Model
     }
 
     public function get_shared_by(int $ownerid) : array {
-        return NoteShare1::get_shared_by($this->id, $ownerid);
+        return NoteShare::get_shared_by($this->id, $ownerid);
         
     }
 
 
     public function shared_by() : array {
         
-        $shared =  NoteShare1::get_shared_note($this);
+        $shared =  NoteShare::get_shared_note($this);
         $ids = [];
         foreach($shared as $shared_note) {
           $id = $shared_note->owner;
@@ -183,15 +199,6 @@ class User extends Model
         }
         return $sharers;
     }
-
-  /*  public function get_notes_pinned(): array
-    {
-        return Note::get_notes_pinned($this);
-    }
-    public function get_notes_unpinned(): array
-    {
-        return Note::get_notes_unpinned($this);
-    }*/
     private function get_notes(bool $pinned): array
     {
         $pinnedCondition = $pinned ? '1' : '0';
@@ -277,9 +284,12 @@ class User extends Model
         self::execute("UPDATE users SET mail =:mail, full_name = :name WHERE id = :id ", ["mail" => $mail, "name"=>$name, "id" => $this->id]);    
     }
 
-    public function validate_title_note($title){
+    public function validate_title_note($id, $title){
+        $val =trim($title);
         $error = [];
-        $query = self::execute("select title from notes where owner = :user_id and title = :title", ['user_id'=>$this->id, 'title'=>$title]);
+
+        $query = $id == 0 ? self::execute("select title from notes where owner = :user_id and title = :title", ['user_id'=>$this->id, 'title'=>$val]) :
+                            self::execute("select title from notes where owner = :user_id and title = :title and id != :id", ['user_id'=>$this->id, 'title'=>$val,'id' => $id]);
         $data = $query->fetchAll();
         if (count($data) != 0) {
             $error[] = "⚠already exists";
@@ -287,10 +297,56 @@ class User extends Model
         return $error;
         
     }
-    public function get_all_my_labels(int $user_id) {
-        $query = self::execute("SELECT id, label FROM notes JOIN note_labels ON 
-                                note_labels.note = notes.id WHERE owner = :owner", ["owner" => $user_id]);
+    public function get_all_my_labels_notes() {
+        $query = self::execute("SELECT distinct label, id FROM notes JOIN note_labels ON 
+                                note_labels.note = notes.id WHERE owner = :owner ", ["owner" => $this->id]);
          return $query->fetchAll();                       
+    }
+
+    public function get_all_my_labels() {
+        $data = [];
+        $query = self::execute("SELECT DISTINCT label FROM notes JOIN note_labels ON 
+        note_labels.note = notes.id WHERE owner = :owner ", ["owner" => $this->id]);
+        $data = $query->fetchAll(); 
+  
+        return $data;
+    }
+
+    public function search(Array $labels) {
+        $data = [];
+        foreach ($labels as $label) {
+            $query = self::execute("SELECT DISTINCT id FROM notes JOIN note_labels ON note = id WHERE owner = :owner AND label = :label", ["owner" => $this->id, "label" =>$label]);
+            $data[] = $query->fetchAll();
+        }
+        return $data;
+    }
+
+    public function filtred_notes_labels($labels, $user) {
+        $filtred_notes = [];
+        $data = [];
+        if (!empty($labels)) {
+        $labels_str = implode(',', array_map(function($label) {
+            return "'" . $label . "'";
+        }, $labels));
+    
+            $query = self::execute("SELECT distinct id, title, owner FROM notes JOIN note_labels ON id = note WHERE label IN ($labels_str) AND owner = :owner ORDER BY -weight", ["owner" => $user]);
+            $data = $query->fetchAll();
+            $content_checklist = [];
+            foreach ($data as &$row) {
+                $dataQuery = self::execute("SELECT content FROM text_notes WHERE id = :note_id", ["note_id" => $row["id"]]);
+                $content = $dataQuery->fetchColumn();
+    
+                if (!$content) {
+                    $dataQuery = self::execute("SELECT content, checked FROM checklist_note_items WHERE checklist_note = :note_id order by checked, id ", ["note_id" => $row["id"]]);
+                    $content_checklist = $dataQuery->fetchAll();
+                }
+                $row["content"] = $content;
+                $row["content_checklist"] = $content_checklist;
+            }
+            $filtred_notes[] = $data;
+        }
+        
+        return $filtred_notes;
     }
 }
 

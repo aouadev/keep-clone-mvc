@@ -52,7 +52,7 @@ body{
 
 .main_login_signup form .inputbox input {
   outline: none;
-  background: #2d3442;
+  background:   #2d3442;
   padding-left: 20px;
   color: white;
   font-size: 17px;
@@ -72,13 +72,18 @@ body{
   width: 85%;
   border-radius: 0 5px 5px 0;
   border: 1px solid #48505f;
+  
 }
 
-input:focus {
+.main_login_signup form .inputbox input:focus {
   border: 1.5px solid rgb(142, 180, 204);
   box-shadow: 0 0 8px 2px rgb(48, 109, 208, 1);
   border-radius: 0 7px 0 7px 0;
+  background: #2d3442;
 
+}
+input::placeholder {
+  color: gray;
 }
 
 .main_login_signup form .inputbox i {
@@ -111,6 +116,7 @@ input:focus {
 .main_login_signup form .text input {
   color: white;
   font-size: 17px;
+  
 }
 
 .main_login_signup form .subscribe-link a {
@@ -129,9 +135,11 @@ input:focus {
 }
 
 .errors {
-  color: red;
-  font-weight: 300;
+  color:rgb(189, 76, 102);
+  font-weight: 450;
   font-size: 15px;
+  position: relative;
+  
 }
 
 .errors li {
@@ -178,9 +186,9 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   margin: 5px;
-  position: absolute;
-  top: 85px;
-  left: 5px;
+  position: relative;
+  
+  margin-left: 5px;
   margin-left: 0;
 }
 
@@ -225,24 +233,20 @@ h2 {
 .note-title {
   font-size: 18px;
   border-bottom: 1.5px solid #43464c;
-  ;
   border-top-right-radius: 5px;
   border-top-left-radius: 5px;
-  padding: 3px 10px;
+  padding: 3px 20px;
   background: #292c30;
 }
 
-.note-content {
-  padding: 20px;
+/*.note-content {
+  padding: 0 10px 0 10px ;
   font-weight: 350;
   font-size: 15px;
-  position: relative;
-  bottom: 30px;
   top: 0;
+  position: relative;
   
-  
-  
-}
+}*/
 
 .content_text {
   display: -webkit-box;
@@ -250,6 +254,8 @@ h2 {
   -webkit-box-orient: vertical;
   overflow: hidden;
   position: relative;
+  padding: 0 0 0 10px;
+
 
 }
 
@@ -258,9 +264,10 @@ h2 {
   max-height: 5em;
   line-height: 1.7em;
   overflow: hidden;
+  padding: 0 10px 0 10px;
 }
 
-.content_check::after {
+.content_check:not(:last-child)::after  {
   content: '...';
   position: relative;
 }
@@ -342,7 +349,9 @@ h2 {
   justify-content: space-around;
   background: #292c30;
   padding: 2px;
+  
 }
+
 
 .card-footer input {
   background-color: unset;
@@ -352,14 +361,16 @@ h2 {
 
 .note {
 
-  border: 1.5px solid #43464c;
-  color: white;
+  border: 1.5px solid#43464c;
+
   border-radius: 5px;
   width: 188px;
-  background: #202325;
+
   margin: 3px;
   position: relative;
-  min-height: 230px;
+  min-height: 100px;
+ 
+  
   
 }
 
@@ -643,7 +654,7 @@ nav a {
 
 .note_body_text {
     color : lightgray;
-    position: absolute;
+    position: relative;
     
     top: 230px;
     left: 3%;
@@ -658,6 +669,20 @@ nav a {
 }
 .add_text_note {
   background-color: transparent;
+  position: relative;
+  left: 3%;
+  padding: 15px;
+  width: 94%;
+  border-radius: 7PX;
+  color : lightgray;
+  top: 230px;
+  height: 500px;
+}
+#errDescription {
+  position: absolute;
+  left: 3%;
+  top: 735px;
+  
 }
 
 /*error edit and add text_note*/
@@ -793,16 +818,107 @@ input:focus, textarea:focus {
 }
 
 .title_edit_note {
+  background: transparent;
   position: absolute;
   top: 125px;
   left: 3%;
   color: lightgray;
-  background-color: transparent;
+
   width: 94%;
   padding: 7px 7px 7px 10px;
   border: 1.7px solid #494c51;
   border-radius: 7px;
 }
+.title_add {
+  background: transparent;
+  color: lightgrey;
+
+}
+.add_cn, .edit_cn{
+  position: absolute;
+  top: 250px;
+  left: 3%;
+  width: 96%;
+}
+.edit_cn {
+  left: 1%;
+  
+}
+.item_new{
+  margin: 20px;
+  color:white;
+  width: 94%;
+  background-color: transparent;
+  border: 1px solid gray;
+  border-radius: 5px;
+  padding: 7px 7px 7px 10px;
+}
+.item_edit {
+  background-color: transparent;
+  border: 1px solid gray;
+  padding: 7px 7px 7px 10px;
+  width: 94%;
+  color: lightgray;
+  margin-left:50px ;
+  
+  
+}
+.err_item_edit {
+  position: absolute;
+  top:41px;
+  display:flexbox;
+  
+}
+#errNewItem {
+  position:relative;
+
+}
+.edit_cn_item {
+  
+  position: relative;
+  display: flex;
+  
+  
+  margin:0 0 25px 20px;
+}
+.add_cn_check_icon {
+  background:#383c44;
+  border-radius: 5px 0 0 5px;
+  border: 1px solid gray;
+  border-right: none;
+  position: absolute;
+  width: 50px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  color: gray;
+  align-items: center;
+}
+.uncheck_item_icon {
+
+ 
+  background: #202325;
+  border: 0.7px solid rgb(109, 101, 101);
+  border-radius: 3px;
+  width: 16px;
+  height: 16px;
+}
+#check_item_icon {
+  background-color: #0652DD;
+  border-radius: 3px;
+  width: 16px;
+  height: 16px;
+  font-size:medium;
+  color: lightgray;
+}
+#content_checked {
+  text-decoration:line-through;
+}
+.add_new_item {
+  margin-left: 3%;
+  
+}
+ 
 
 .erreur_edit {
   color: red;
@@ -811,6 +927,8 @@ input:focus, textarea:focus {
   left: 4%;
 
 }
+
+
 
 .edit_checklist_form {
   margin-bottom: 10px;
@@ -921,11 +1039,7 @@ input:focus, textarea:focus {
   color: lightgrey;
 }
 
-.title_add {
-  background: transparent;
-  color: lightgrey;
 
-}
 
 .title_add:focus {
 
@@ -954,6 +1068,7 @@ input:focus, textarea:focus {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   width: 50px;
+  
 }
 .view-share-title {
   font-size: 15px;
@@ -1027,6 +1142,10 @@ input:focus, textarea:focus {
   position: absolute;
   top : 170px;
 }
+.error_add_cn_note {
+  position: relative;
+  
+}
 
 /*confirm delete note*/
 .container_delete_note {
@@ -1098,14 +1217,16 @@ form .add_label input {
   color: white;
 } 
 .my_labels {
-  position: absolute;
-  bottom: 0px;
-  display: flex;
+  position: relative;
+  display:flex;
   padding: 5px;
   flex-wrap: wrap;
-  
  
+  margin-bottom: 35px;
+  
+  margin-top:5px;
 }
+
 .label {
   padding: 0 5px 0 5px ;
   background-color: gray;
@@ -1114,3 +1235,59 @@ form .add_label input {
   font-weight: 550;
   font-size: 13px;
 }
+/* Search notes with tags*/
+.search_items {
+  margin: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  position: relative;
+  
+}
+.search_form {
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+  margin-left: 2%;
+  
+
+}
+#search_check_uncheck_icon {
+  display: flex;
+}
+.check_uncheck_label {
+  margin-left: 5px;
+}
+.my_notes_labels {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: 2%;
+  
+}
+.your_notes_title {
+  position: relative;
+  margin-left: 2%;
+  
+}
+.search_shared {
+  position: relative;
+  margin-left: 2%;
+}
+.search_title_tag {
+  color: white;
+  position: relative;
+  font-size: 17px;
+  font-weight: 600;
+  margin-left: 2%;
+
+}
+#error_items_empty {
+  position: relative;
+  top: 230px;
+  left: 3%;
+}
+.form-control:focus {
+  background-color: transparent;
+  color: lightgray;
+}
+

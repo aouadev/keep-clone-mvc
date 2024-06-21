@@ -3,7 +3,7 @@ require_once "framework/Model.php";
 require_once "User.php";
 require_once "Note.php";
 
-class NoteShare1 extends Model {
+class NoteShare extends Model {
     public function __construct(public int $note, public int $user, public bool $editor) {
 
     }
@@ -40,6 +40,32 @@ class NoteShare1 extends Model {
         }
         return $shared;
     }
+
+    
+    public static function get_shared_filtred(int $userid, int $ownerid, $labels) : array {
+        $shared_by = [];
+        if (!empty($labels)) {
+            $labels_str = implode(',', array_map(function($label) {
+                return "'" . $label . "'";
+            }, $labels));
+        $query = self::execute("SELECT distinct id, title, owner FROM notes JOIN note_shares ON notes.id = note_shares.note JOIN note_labels ON note_labels.note = notes.id WHERE note_shares.user = :userid and 
+        notes.owner = :ownerid and  label IN ($labels_str)", ["ownerid"=>$ownerid, "userid"=>$userid]);
+        $shared_by = $query->fetchAll();
+        $content_checklist = [];
+        foreach ($shared_by as &$row) {
+             $dataQuery = self::execute("SELECT content FROM text_notes WHERE id = :note_id", ["note_id" => $row["id"]]);
+             $content = $dataQuery->fetchColumn(); 
+           
+             if(!$content) {
+                 $dataQuery = self::execute("SELECT content, checked FROM checklist_note_items WHERE checklist_note = :note_id ", ["note_id" => $row["id"]]);
+                 $content_checklist = $dataQuery->fetchAll();
+             }
+             $row["content"] = $content;
+             $row["content_checklist"] = $content_checklist;
+            }
+        }
+        return $shared_by;
+}
    
     
 }

@@ -5,52 +5,57 @@
     <meta charset="UTF-8">
     <base href="<?= $web_root ?>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projet Keep</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <title>My Notes</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
+    <script src="lib/jquery.ui.touch-punch.js" type="text/javascript"></script>
+ 
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="css/style.css" rel="stylesheet" type="text/css">
     <script>
-        $(document).ready(function() {
-            $("#pinned").sortable({
-                connectWith: "#unpinned",
-                update: function(event, ui) {
-                    var order = $(this).sortable("serialize") + '&update=update';
-                    $.ajax({
-                        url: "note/drag_and_drop",
-                        type: "POST",
-                        data: order,
-                        success: function(response) {
-                            console.log(response);
-
-                        },
-                        error: function(xhr, status, error) {
-                            console.error(error);
-                        }
-                    });
+    $(document).ready(function() {
+    $("#pinned").sortable({
+        connectWith: "#unpinned",
+        update: function(event, ui) {
+            var order_pinned = $(this).sortable("toArray", { attribute: "id" });
+            console.log("Order sent from pinned:", order_pinned);
+            $.ajax({
+                url: "note/drag_and_drop",
+                type: "POST",
+                data: { order_pinned: order_pinned, update: "update" },
+                success: function(response) {
+                    console.log("Response:", response);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", xhr.responseText);
                 }
             });
-            $("#unpinned").sortable({
-                connectWith: "#pinned",
-                update: function(event, ui) {
-                    var order = $(this).sortable("serialize") + '&update=update';
-                    $.ajax({
-                        url: "note/drag_and_drop",
-                        type: "POST",
-                        data: order,
-                        success: function(response) {
-                            console.log(response);
-                        }
-                    });
+        }
+    });
+    $("#unpinned").sortable({
+        connectWith: "#pinned",
+        update: function(event, ui) {
+            var order_unpinned = $(this).sortable("toArray", { attribute: "id" });
+            console.log("Order sent from unpinned:", order_unpinned);
+            $.ajax({
+                url: "note/drag_and_drop",
+                type: "POST",
+                data: { order_unpinned: order_unpinned, update: "update" },
+                success: function(response) {
+                    console.log("Response:", response);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error:", xhr.responseText);
                 }
             });
+        }
+    });
+});
 
-        });
     </script>
 </head>
 
@@ -63,13 +68,13 @@
     </div>
         <?php if (count($notes_pinned) != 0 ) :  ?>
             <p class="title_note_pinned">Pinned</p>
-            <div id="pinned" class="connecedSortable view_notes_pinned_unpinned">
+            <div id="pinned" class="connetedSortable view_notes_pinned_unpinned">
                 <?php for ($i = 0; $i < count($notes_pinned); $i++) { ?>
-                    <div class="note">
+                    <div id="<?= $notes_pinned[$i]["id"]; ?>" class="note .bg-success">
                         <a class="link-note-archivee" href='open_note/index/<?= $notes_pinned[$i]["id"]; ?>/<?=$back?>/0'>
                             <p class="note-title"><?= $notes_pinned[$i]["title"]; ?></p>
-                            <div class="note-content">
-                            <?php var_dump($notes_pinned[$i]['weight']); ?>
+                            
+                         
                                 <?php if ($notes_pinned[$i]["content"] && $notes_pinned[$i]["content"] !== "") : ?>
                                     <div class="content_text">
                                         <?= $notes_pinned[$i]["content"] ?>
@@ -87,7 +92,8 @@
                                         </div>
                                     </div>
                                 <?php endif; ?>
-                            </div>
+                     
+                        
                         </a>
                         <div class="my_labels">
                         <?php foreach ($my_labels as $label): ?>
@@ -96,7 +102,27 @@
                             <?php endif; ?>
 
                         <?php endforeach ;?>
+                            </div>
+                            <noscript>
+                        <div class="card-footer">
+                    <?php if ($i > 0) : ?>
+                        <form action="note/move_left" class="left" method="post">
+                            <input name="left" type="number" value='<?=$notes_pinned[$i]["id"] ?>' hidden>
+                            <input class="material-symbols-outlined"type='submit' value="keyboard_double_arrow_left">
+                        </form>
+                        <?php endif; ?>
+                    <?php if ($i < count($notes_pinned) - 1) : ?>
+                        <form action="note/move_right" class="right" method="post">
+                            <input name="right" type="number" value='<?=$notes_pinned[$i]["id"] ?>' hidden>
+                          <input class="material-symbols-outlined"type='submit' value="keyboard_double_arrow_right">
+                            
+                        </form>
+                        <?php endif; ?>
                     </div>
+                     </noscript>
+                 
+                    
+              
                     </div>
                                  
                 <?php } ?>
@@ -104,13 +130,13 @@
         <?php endif; ?>
         <?php if (count($notes_unpinned) != 0):?>
             <p class="title_note_unpinned">Others</p>
-            <div id="unpinned" class="connecedSortable view_notes_pinned_unpinned">
+            <div id="unpinned" class="connetedSortable view_notes_pinned_unpinned">
                 <?php for ($i = 0; $i < count($notes_unpinned); $i++) { ?>
-                    <div class="note">
+                    <div id="<?= $notes_unpinned[$i]["id"]; ?>" class="note">
                         <a class="link-note-archivee" href='open_note/index/<?= $notes_unpinned[$i]["id"]; ?>/<?=$back?>/0'>
-                            <p class="note-title"><?= $notes_unpinned[$i]["title"];  ?></p>
-                            <div class="note-content">
-                            <?php var_dump($notes_unpinned[$i]['weight']); ?>
+                            <p class="note-title"><?= $notes_unpinned[$i]["title"];?></p>
+                         
+                        
                                 <?php if ($notes_unpinned[$i]["content"] && !empty($notes_unpinned[$i]["content"])): ?>
                                     <div class="content_text">
                                    
@@ -129,9 +155,8 @@
                                         </div>
                                     </div>
                                 <?php endif; ?>
-                            </div>
-                        </a>
-                        <div class="my_labels">
+                           
+                            <div class="my_labels">
                         <?php foreach ($my_labels as $label): ?>
                             <?php if($label['id'] == $notes_unpinned[$i]['id']): ?>
                                 <div class="label"><?=$label['label']?></div>
@@ -139,6 +164,25 @@
 
                         <?php endforeach ;?>
                     </div>
+                        </a>
+             
+                    <noscript>
+                        <div class="card-footer">
+                    <?php if ($i > 0) : ?>
+ 
+                        <form action="note/move_left" class="left" method="post">
+                            <input name="left" type="number" value='<?=$notes_unpinned[$i]["id"] ?>' hidden>
+                            <input class="material-symbols-outlined"type='submit' value="keyboard_double_arrow_left">
+                        </form>
+                        <?php endif; ?>
+                    <?php if ($i < count($notes_unpinned) - 1) : ?>
+                        <form action="note/move_right" class="right" method="post">
+                            <input name="right" type="number" value='<?=$notes_unpinned[$i]["id"] ?>' hidden>
+                            <input class="material-symbols-outlined"type='submit' value="keyboard_double_arrow_right">
+                        </form>
+                        <?php endif; ?>
+                    </div>
+                    </noscript>
                     </div>
                 <?php } ?>
             </div>
@@ -151,7 +195,7 @@
     </div>
     <footer class="">
             <div class="position-relative bottom-0 w-100 float-end ">
-            <a href="note/add_checklist_note">
+            <a href="note/edit_checklist_note/0">
                 
                 <span class="material-symbols-outlined text-warning text-lg  text-lg-end m-2 float-end">checklist</span>
             </a>

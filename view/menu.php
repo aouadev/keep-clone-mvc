@@ -7,6 +7,7 @@
         <label id="hamburger-logo" for="hamburger"><label id="burger-title">NoteApp</label></label>
         <nav>
           <a href="note/index" class="<?=($currentPage == 'my_notes') ? 'active' : 'not_active'?>">My notes</a>
+          <a href="note/search" class="<?=($currentPage == 'search') ? 'active' : 'not_active' ?>">Search</a>
           <a href="user/my_archives" class="<?=($currentPage == 'my_archives') ? 'active' : 'not_active' ?>">My archives</a>
           <?php if($sharers!= null ): ?>
             <?php foreach ($sharers as $userr): ?>

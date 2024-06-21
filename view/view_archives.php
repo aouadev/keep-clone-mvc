@@ -13,17 +13,19 @@
 </head>
 <body>
 <?php include("menu.php"); ?>
+<?php $back = "back_archives" ?>
     <h1>My archives</h1>
     <h2>Archives</h2> 
     <div class="my-archives">
         <?php if (count($archives) != 0): ?>
          
             <?php foreach ($archives as $note_item): ?> 
+                <a class="link-note-archivee" href="open_note/index/<?=$note_item["id"]?>/<?=$back ?>/0"> 
                 <div class="note-archivee">
-                    <?php $back = "back_archives" ?>
-                    <a class="link-note-archivee" href="open_note/index/<?=$note_item["id"]?>/<?=$back ?>/0">   
+                
+                   
                         <?php include("note_in_list.php") ?>
-                    </a>
+                    
                     <div class="my_labels">
                     
                     <?php foreach ($my_labels as $label): ?>
@@ -34,6 +36,7 @@
                     <?php endforeach ;?>
                 </div>
                 </div>
+                </a>
             <?php endforeach; ?>
         <?php endif; ?>
     

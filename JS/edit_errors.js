@@ -3,21 +3,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const contentInput = document.getElementById('content');  // Ajout du champ de contenu
     const titleErrorDiv = document.getElementById('titleError');
     const contentErrorDiv = document.getElementById('contentError');  // Div pour les erreurs de contenu
+    const btnSave = document.getElementById('saveButton');
 
-    // Désactiver le bouton save si une des classes 'is-invalid' est présente
-    function updateSaveButtonState() {
-        saveButton.disabled = titleInput.classList.contains('is-invalid') || contentInput.classList.contains('is-invalid');
-    }
-
-    titleInput.addEventListener('input', function () {
+    titleInput.addEventListener(function () {
         const title = titleInput.value;
         let errorMessage = '';
-
-        if (title.length < 3) {
+        
+        if (title.length < $minLength) {
             errorMessage = 'Le titre doit contenir au moins 3 caractères.';
-        } else if (title.length > 25) {
+        } else if (title.length > maxLength) {
             errorMessage = 'Le titre ne doit pas dépasser 25 caractères.';
         }
+
+    
+
 
         if (errorMessage) {
             titleErrorDiv.textContent = errorMessage;
@@ -25,13 +24,14 @@ document.addEventListener('DOMContentLoaded', function () {
             titleInput.classList.add('is-invalid');
             titleInput.classList.remove('is-valid');
         } else {
-            //checkTitleUniqueness(title); soucis acces (403)
-            titleErrorDiv.textContent = ""; //petit soucis nettoyage div
+            
+            titleErrorDiv.textContent = ""; 
             contentErrorDiv.style.display = 'none';
             titleInput.classList.remove('is-invalid');
             titleInput.classList.add('is-valid');
+            
         }
-        updateSaveButtonState();
+       // updateSaveButtonState();
     });
 
     contentInput.addEventListener('input', function () {
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function () {
             contentInput.classList.remove('is-invalid');
             contentInput.classList.add('is-valid');
         }
-        updateSaveButtonState();
+       // updateSaveButtonState();
     });
 
     function checkTitleUniqueness(title) {
