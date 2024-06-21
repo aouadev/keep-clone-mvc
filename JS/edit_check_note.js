@@ -38,18 +38,13 @@ function checkItemsValidations() {
     let ok = true;
     let items = $("input[name='content[]']");
     let values = new Set();
-    items
     error_items_empty.html("");
 
     items.each(function() {
-  
         let currentItem = $(this);
         let currentValue = currentItem.val();
         let errContainer = currentItem.nextAll('#errItem');
-     
-
         errContainer.html("");
-
         if (currentValue !== "") {
             if (values.has(currentValue )) {
                 errContainer.append("<p>⚠ Item must be unique.</p>");
@@ -117,7 +112,9 @@ function validateNewItem() {
     }
     if (newItem.val().length == 0) {
         newItem.removeClass('is-valid');
+        ok = true;
     }
+    return ok;
     
 }
 function inContents() {
@@ -132,8 +129,12 @@ function inContents() {
 }
 
 function updateSaveButtonState() {
-    isValid = checkTitleExists() && checkTitle() && checkItemUniqueness();
+    isValid = checkTitleExists() && checkTitle() && checkItemsValidations();
     saveButton.prop('disabled', !isValid);
+}
+function updateBtnAddItem() {
+    isValid = validateNewItem();
+    $('#btn_add_item').prop('disabled', !validateNewItem());
 }
 
 
@@ -163,7 +164,8 @@ $(function() {
     errNewItem = $('#errNewItem');
     newItem.bind("input", function() {
         validateNewItem();
-      //  updateSaveButtonState();
+       updateSaveButtonState();
+       updateBtnAddItem();
     });
 
     title.on("input", function() {

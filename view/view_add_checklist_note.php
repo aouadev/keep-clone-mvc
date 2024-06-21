@@ -114,10 +114,11 @@
                     <label class="">New Item</label>
                 <div class="add_label">
                     <input  type="text" class="label_txt form-control <?= (!empty($new_item_error) ? "is-invalid" :
-         (isset($_POST["new_item"]) && !empty($_POST["new_item"]) ? "is-valid" : "")) ?>" name="new_item" id="newItem" value="<?=$new_item?>">
+                    (isset($_POST["new_item"]) && !empty($_POST["new_item"]) ? "is-valid" : "")) ?>" 
+                    name="new_item" id="newItem" value="<?=$new_item?>">
                    
                     <div class="col-btn ">
-                        <input class="btn btn-primary btn-plus" value="+" type="submit">
+                        <input class="btn btn-primary btn-plus" id="btn_add_item" value="+" type="submit">
                     </div>
                
                 </div>

@@ -46,6 +46,7 @@
  
 
     <div class="your_notes_title"><?=count($my_notes) == 0 ? '' : 'Your notes :'?></div>
+   
     <div class="my_notes_labels">
     <?php if (count($my_notes) != 0): ?>
          

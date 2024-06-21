@@ -183,15 +183,6 @@ class User extends Model
         }
         return $sharers;
     }
-
-  /*  public function get_notes_pinned(): array
-    {
-        return Note::get_notes_pinned($this);
-    }
-    public function get_notes_unpinned(): array
-    {
-        return Note::get_notes_unpinned($this);
-    }*/
     private function get_notes(bool $pinned): array
     {
         $pinnedCondition = $pinned ? '1' : '0';
@@ -298,7 +289,7 @@ class User extends Model
 
     public function get_all_my_labels() {
         $data = [];
-        $query = self::execute("SELECT distinct label FROM notes JOIN note_labels ON 
+        $query = self::execute("SELECT DISTINCT label FROM notes JOIN note_labels ON 
         note_labels.note = notes.id WHERE owner = :owner ", ["owner" => $this->id]);
         $data = $query->fetchAll(); 
   

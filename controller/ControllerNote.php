@@ -76,10 +76,7 @@ class ControllerNote extends Controller
             $content = $_POST['content'];
             
   
-            $errors = $user->validate_name($title); 
-           /* if (!($user->validate_title_note($id, $title))){
-                $errors[] = "⚠already exists";
-            }*/
+            $errors = $user->validate_name($title);        
 
             $errors = array_merge($errors, $user->validate_title_note($id, $title));
             if(empty($errors) ) {
@@ -339,7 +336,6 @@ class ControllerNote extends Controller
             $user_id = $note->owner;
             
             $other_labels = $note->other_labels($note_id, $user_id);
-            var_dump($other_labels);
             
       
             if (isset($_POST['delete'])) {
@@ -427,24 +423,23 @@ class ControllerNote extends Controller
      
         
         if (isset($_POST['check_labels'])) {
+            
             $data = $_POST['check_labels'];
+          
             $encoded_data = Tools::url_safe_encode($data);
-       
-            
-            
-       
-            
             $this->redirect('note', "search/$encoded_data");
         }
         if (isset($_GET['param1'])) {
             $decoded_data = Tools::url_safe_decode($_GET['param1']);
             if ($decoded_data !== false) {
                 $data = $decoded_data;
+                var_dump($data);
             }
         
         }
         
         $my_notes = $user->filtred_notes_labels($data, $user->id);
+        var_dump($my_notes);
         foreach($user->shared_by() as $shared_by_user) {
             
              $shared_by[] = NoteShare::get_shared_filtred($user->id, $shared_by_user->id, $data);

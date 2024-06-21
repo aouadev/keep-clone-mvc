@@ -519,11 +519,11 @@ abstract class Note extends Model
         if (strlen($label) < $minLength || strlen($label) > $maxLength)
             $errors[] =  "⚠ Label length must be between 2 and 10";
         if ($this->same_label($label)) 
-            $errors[] = "⚠ A note cannot contain the same label Twice twice";
+            $errors[] = "⚠ A note cannot contain the same label Twice";
         return $errors;
     }
 
-    public function same_label($label) {
+    public  function same_label($label) {
         $query = self::execute("select label from note_labels where note = :id and label = :label", ["id" => $this->note_id, "label"=>$label]);
         return $query->fetch();
     }

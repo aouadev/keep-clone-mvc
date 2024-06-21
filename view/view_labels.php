@@ -17,28 +17,29 @@
         const minLength = <?=Configuration::get('label_min_length'); ?>;
         const maxLength = <?=Configuration::get('label_max_length'); ?>;
         const id = <?=$note_id?> ;
+       let labels = <?=json_encode(array_column($labels, 'label'));?>;
         let label, errLabel;
-        $(function() {
-            label = $("#add_label");
-            errLabel = $("#errLabel");
-            label.bind("input", checkLabel);
-            label.bind("input", checkLabelUnicity);
-            console.log(checkAll());
-      
 
-
-        });
         function checkLabel() {
-            let ok = true;
             errLabel.html("");
+            let ok = true;
+       
             if (label.val().length < minLength || label.val().length > maxLength) {
-                errLabel.append("Label must be between 2 and 10");
+                errLabel.append("Label must be cooooo between 2 and 10");
                 ok = false;
             }
+           
             return ok;
         }
+        function updateBtnAdd() {
+            isValid = checkLabel() && checkUnicity();
+            label.removeClass("is-valid is-invalid")
+            labelClass =  isValid ? "is-valid" : "is-invalid";
+            $("#label").addClass(labelClass);
+            $("#add_label_btn").prop("disabled", !isValid);
+        }
         
-        async function checkLabelUnicity() {
+      /*  async function checkLabelUnicity() {
             let ok = true;
             const data = await $.getJSON("note/Label_is_unique/" + id + "/"+ label.val());
             if (data) {
@@ -47,7 +48,20 @@
         }
         
         return ok;
-        }
+        }*/
+        function checkUnicity() { //  une fonction non async pour gérer la désactivation activation du bouton add 
+            let ok = true;
+            errLabel.html("");
+            console.log(labels);
+            console.log(label.val());
+            if (labels.includes(label.val())) {
+                $('#errLabel').append("<p>A note cannot contain the same label Twice.</p>");
+                console.log(errLabel.val());
+                ok = false;
+            }
+            return ok;
+    }
+
         async function checkAll() {
             let ok = checkLabel();
             if (ok) {
@@ -55,6 +69,18 @@
             }
             return ok;
         }
+        $(function() {
+            label = $("#label");
+            errLabel = $("#errLabel");
+            label.bind("input", function() {
+                updateBtnAdd();
+            });
+  
+         
+      
+
+
+        });
   
     </script>
     <script>
@@ -94,10 +120,11 @@
             <?php endif; ?>
         </div>
         <form action="note/open_labels/<?=$note_id?>" method = "post" onsubmit="return checkAll();">
-            <label class="label_title">Add a new Label</label>
+            <label class="label_title ">Add a new Label</label>
             <div class="add_label">
-                <input list="labels_list" type="text" class="label_txt" name="label" id="add_label"
-                autocomplete="off" value="<?=$label?>" placeholder="Type to search or create...">
+
+                <input list="labels_list" type="text" class="label_txt " name="label" id="label"
+                autocomplete="off" value="<?=$label?>" placeholder="Type to search or create..."> <!-- j'ai supprimé la gestion de la couleur de l'input car le placeholder devient invisible-->
                
                 <datalist  id="labels_list" >
                
@@ -109,7 +136,8 @@
                     <?php endforeach; ?>
                 </datalist>
                 <div class="col-btn ">
-                    <input class="btn btn-primary btn-plus" value="+" type="submit">
+                    <input class="btn btn-primary btn-plus" 
+                    id="add_label_btn" value="+" type="submit">
                 </div>
             
             </div>
