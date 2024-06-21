@@ -9,8 +9,57 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
+  
+    <script src="lib/jquery-3.7.1.min.js" type="text/javascript"></script>
     <link href="css/style.css" rel="stylesheet" type="text/css" />
-    <script src="JS/edit_errors.js" ></script>
+ 
+    <script>
+        const minLength = <?=Configuration::get('label_min_length'); ?>;
+        const maxLength = <?=Configuration::get('label_max_length'); ?>;
+        const id = <?=$note_id?> ;
+        let label, errLabel;
+        $(function() {
+            label = $("#add_label");
+            errLabel = $("#errLabel");
+            label.bind("input", checkLabel);
+            label.bind("input", checkLabelUnicity);
+            console.log(checkAll());
+      
+
+
+        });
+        function checkLabel() {
+            let ok = true;
+            errLabel.html("");
+            if (label.val().length < minLength || label.val().length > maxLength) {
+                errLabel.append("Label must be between 2 and 10");
+                ok = false;
+            }
+            return ok;
+        }
+        
+        async function checkLabelUnicity() {
+            let ok = true;
+            const data = await $.getJSON("note/Label_is_unique/" + id + "/"+ label.val());
+            if (data) {
+                errLabel.append("<p>A note cannot contain the same label Twice.</p>");
+                ok = false;
+        }
+        
+        return ok;
+        }
+        async function checkAll() {
+            let ok = checkLabel();
+            if (ok) {
+                ok = await checkLabelUnicity();
+            }
+            return ok;
+        }
+  
+    </script>
+    <script>
+
+    </script>
 </head>
 <body>
   
@@ -44,10 +93,11 @@
                 
             <?php endif; ?>
         </div>
-        <form action="note/open_labels/<?=$note_id?>" method = "post">
+        <form action="note/open_labels/<?=$note_id?>" method = "post" onsubmit="return checkAll();">
             <label class="label_title">Add a new Label</label>
             <div class="add_label">
-                <input list="labels_list" type="text" class="label_txt" name="label" autocomplete="off" value="<?=$label?>" placeholder="Type to search or create...">
+                <input list="labels_list" type="text" class="label_txt" name="label" id="add_label"
+                autocomplete="off" value="<?=$label?>" placeholder="Type to search or create...">
                
                 <datalist  id="labels_list" >
                
@@ -61,7 +111,10 @@
                 <div class="col-btn ">
                     <input class="btn btn-primary btn-plus" value="+" type="submit">
                 </div>
+            
             </div>
+            <div class="errors" id="errLabel"></div>
+        
             
             <?php if (count($errors) != 0): ?>
                 <div class="errors">

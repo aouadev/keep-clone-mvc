@@ -18,19 +18,19 @@
     <form action="main/signup" method="post">
             <div class="inputbox text">
             <i class="material-symbols-outlined">mail</i>
-            <input id="mail" name="mail" type="email" placeholder="Email" value="<?= $mail ?>">
+            <input id="mail" name="mail" class="form-control" type="email" placeholder="Email" value="<?= $mail ?>">
             </div>
             <div class="inputbox text">
             <i class="material-symbols-outlined">person</i>
-            <input id="full_name" name="full_name" type="text" placeholder="Full Name" value="<?= $full_name ?>">
+            <input id="full_name" name="full_name" type="text" placeholder="Full Name" value="<?= $full_name ?>" class="form-control">
             </div>
              <div class="inputbox text">
              <i class="material-symbols-outlined">key</i>
-             <input id="password" name="password" type="password" placeholder="Password" value="<?= $password ?>">
+             <input id="password" name="password" type="password" placeholder="Password" value="<?= $password ?>" class="form-control">
             </div>
             <div class="inputbox text">
              <i class="material-symbols-outlined">key</i>
-             <input id="password_confirm" name="password_confirm" type="password" placeholder="Confirm your password" value="<?= $password_confirm ?>">
+             <input id="password_confirm" name="password_confirm" type="password" placeholder="Confirm your password" value="<?= $password_confirm ?>" class="form-control">
             </div>
          
 

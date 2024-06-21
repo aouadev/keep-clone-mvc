@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
     <script src="lib/jquery-3.7.1.min.js" type="text/javascript"></script>
     <link href="css/style.css" rel="stylesheet" type="text/css" />
-    <script src="JS/edit_note.js" ></script>
+    <script src="JS/edit_text_note.js" ></script>
     <script>
     const minLength = <?=Configuration::get('title_min_length'); ?>;
     const maxLength = <?=Configuration::get('title_max_length'); ?>;
@@ -28,8 +28,8 @@
         </div>
      
         <label for="title" class="title_note_title">Title</label>
-        <input type="text" class="title_edit_note form-control title_add <?= (!empty($errors) ? "border border-danger" :
-         (isset($_POST["title"]) && !empty($_POST["title"]) ? "border border-success" : "")) ?>" id="title" name="title" value="<?= $title ?>">
+        <input type="text" class="title_edit_note form-control title_add <?= (!empty($errors) ? "is-invalid" :
+         (isset($_POST["title"]) && !empty($_POST["title"]) ? "is-valid" : "")) ?>" id="title" name="title" value="<?= $title ?>">
         <div id="titleError" class="errors"></div>
         <div class="error_add_note_php">
             <?php if (count($errors) != 0): ?>

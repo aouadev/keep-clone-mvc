@@ -278,10 +278,11 @@ class User extends Model
     }
 
     public function validate_title_note($id, $title){
+        $val =trim($title);
         $error = [];
 
-        $query = $id == 0 ? self::execute("select title from notes where owner = :user_id and title = :title", ['user_id'=>$this->id, 'title'=>$title]) :
-                            self::execute("select title from notes where owner = :user_id and title = :title and id != :id", ['user_id'=>$this->id, 'title'=>$title,'id' => $id]);
+        $query = $id == 0 ? self::execute("select title from notes where owner = :user_id and title = :title", ['user_id'=>$this->id, 'title'=>$val]) :
+                            self::execute("select title from notes where owner = :user_id and title = :title and id != :id", ['user_id'=>$this->id, 'title'=>$val,'id' => $id]);
         $data = $query->fetchAll();
         if (count($data) != 0) {
             $error[] = "⚠already exists";

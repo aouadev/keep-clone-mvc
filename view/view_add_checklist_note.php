@@ -11,10 +11,12 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
     <script src="lib/jquery-3.7.1.min.js" type="text/javascript"></script>
     <link href="css/style.css" rel="stylesheet" type="text/css" />
-    <script src="JS/edit_note.js" ></script>
+    <script src="JS/edit_check_note.js" ></script>
     <script>
     const minLength = <?=Configuration::get('title_min_length'); ?>;
     const maxLength = <?=Configuration::get('title_max_length'); ?>;
+    const minItemLength = <?=Configuration::get('item_min_length');?>;
+    const maxItemLength = <?=Configuration::get('item_max_length');?>
   
     </script>
       <script>
@@ -30,8 +32,8 @@
             <input class="material-symbols-outlined save" type="submit" id="saveButton" value='save'>
         </div>
         <label for="title" class="title_note_title">Title</label>
-        <input type="text" class="title_edit_note form-control title_add <?= (!empty($title_errors) ? "border border-danger" :
-         (isset($_POST["title"]) && !empty($_POST["title"]) ? "border border-success" : "")) ?>" id="title" name="title" value="<?= $title ?>">
+        <input type="text" class="title_edit_note form-control title_add <?= (!empty($title_errors) ? "is-invalid" :
+         (isset($_POST["title"]) && !empty($_POST["title"]) ? "is-valid" : "")) ?>" id="title" name="title" value="<?= $title ?>">
         <div id="titleError" class="errors"></div>
         <div class="error_add_note_php">
             <?php if (count($title_errors) != 0): ?>
@@ -45,13 +47,15 @@
             <?php endif; ?>
         </div>
         <label for="content" class="note_body_title">Items</label>
+        <div class="errors" id="error_items_empty"><?=$itemless?></div>
         <!--ajouter une nouvelle checklist note -->
         <?php if($id == 0): ?>
             <ul class="add_cn">
             <?php $val = count($content) == 0 ? 5 : count($content); ?>
                 <?php for($i = 0;$i < 5; $i++) : ?>
-                    <li> <input type="text" class="item_new" id="item_content" 
-                    name="content[]" value="<?= count($content) == 0 ? '' : $content[$i]['content']?>"> <div id="errItem" class="errors"></div></li>
+                    <li><input type="text" class="item_new form-control title_add <?= (!empty($items_errors[$i]) ? "is-invalid" :
+         (!empty($content[$i]['content'])? "is-valid" : "")) ?>" id="item_content" 
+                    name="content[]" value="<?= count($content) == 0 ? '' : $content[$i]['content']?>"><div id="errItem" class="errors"></div></li>
                    
                         <div class="error_add_cn_note">
                             <?php if (count($items_errors) != 0): ?>
@@ -66,8 +70,7 @@
                         </div>
                     <?php endfor; ?>
             </ul>
-            <?=var_dump($itemless)?>
-            <div class="errors" id="error_items_empty"><?=$itemless?></div>
+          
             <!--editer une checklist note existante-->
         <?php else : ?> 
                     <div class="edit_cn">
@@ -81,11 +84,20 @@
                                 <div class="uncheck_item_icon"></div>
                             <?php endif; ?>
                         </div>
-                        <input type="text"  class="item_edit <?=$content[$i]['checked'] ? 'content_checked' : 
-                        'content_unchecked'?> " id="item_content" name='content[]' value="<?= $content[$i]['content'] ?>">
-                        <div id="errItem" class="errors"></div>
+                        <input type="text"  class="item_edit form-control <?=$content[$i]['checked'] ? 'content_checked' : 
+                        'content_unchecked'?> <?= (!empty($items_errors[$i]) ? "is-invalid" :
+                        (!empty($content[$i]['content'])? "is-valid" : "")) ?>" id="item_content" name='content[]' value="<?= $content[$i]['content'] ?>" >   
+                       
                         <button name="delete_item"class="btn btn-danger btn-delete-label" value="<?=$content[$i]['id']?>" type="submit">-</button>
+                        <div id="errItem" class="errors err_item_edit"></div>
+                    
                     </div>
+                      
+                  
+                  
+                    
+                   
+               
                     <div class="error_add_cn_note">
                             <?php if (count($items_errors) != 0): ?>
                                 <div class="errors">
@@ -101,14 +113,26 @@
                     <div class="add_new_item">
                     <label class="">New Item</label>
                 <div class="add_label">
-                    <input  type="text" class="label_txt" name="item_content" value="<?=$item_content?>">
+                    <input  type="text" class="label_txt form-control <?= (!empty($new_item_error) ? "is-invalid" :
+         (isset($_POST["new_item"]) && !empty($_POST["new_item"]) ? "is-valid" : "")) ?>" name="new_item" id="newItem" value="<?=$new_item?>">
+                   
                     <div class="col-btn ">
                         <input class="btn btn-primary btn-plus" value="+" type="submit">
                     </div>
+               
                 </div>
-                <div class="errors">
-                    <?=$item_content_error?>
-                </div>
+                <div id="errNewItem" class="errors"></div>
+                  <div class="error_add_cn_note">
+                            <?php if (count($new_item_error) != 0): ?>
+                                <div class="errors">
+                                    <ul>
+                                        <?php foreach ($new_item_error as $error): ?>
+                                            <li><?= $error?></li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+                            <?php endif; ?>
+                    </div>
                     </div>
                     </div>
               

@@ -18,11 +18,11 @@
     <form action="main/login" method="post">
         <div class="inputbox text">
             <i class="material-symbols-outlined">person</i>
-            <input id="mail" name="mail" type="email" placeholder="Email" value="<?= $mail ?>">
+            <input id="mail" name="mail" type="email" placeholder="Email" value="<?= $mail ?>" class="form-control">
         </div>
         <div class="inputbox text">
             <i class="material-symbols-outlined">key</i>
-            <input id="password" name="password" type="password" placeholder="password" value="<?= $password ?>">
+            <input id="password" name="password" type="password" placeholder="password" value="<?= $password ?>" class="form-control">
         </div>
 
 

@@ -61,8 +61,8 @@ class ControllerNote extends Controller
             $id = $_GET['param1'];
       
             if ($id != 0) {
-                $note_id = $_GET['param1'];
-                $note = Note::get_note_by_id($note_id);
+               // $note_id = $_GET['param1'];
+                $note = Note::get_note_by_id($id);
                 $title = $note->title;
                 $content = $note->get_content();
             }
@@ -88,6 +88,7 @@ class ControllerNote extends Controller
                     $weight = $note->max_weight();
                     $note->set_weight($weight + 1);
                     $note->set_content($content);
+                    
                 
                 } else {
             
@@ -95,6 +96,7 @@ class ControllerNote extends Controller
                     $note->set_content($content);
                 }
                $note->persist();
+               $id = $note->note_id;
                $this->redirect("open_note", "index/$note->note_id");
             }
         } 
@@ -106,17 +108,17 @@ class ControllerNote extends Controller
     public function edit_checklist_note() : void {
         $title_errors = [];
         $items_errors = [];
-        $item_content_error = '';
+        $new_item_error = [];
         $error_empty_items = "";
-        $item_content = "";
+        $new_item = "";
         if (isset($_GET['param1']) && $_GET['param1'] !== "" ) {
             $id = $_GET['param1'];
-            if ($id != 0) {
+            if ($id != 0) { // cas de l'édition d'une note
                 $note = Note::get_note_by_id($id);
                 $title = $note->title;
                 $content = $note->get_content();
             }
-            else {
+            else { // cas d'ajout d'une nouvelle note
                 $content = [] ;
                 $title = '';
             }
@@ -125,41 +127,33 @@ class ControllerNote extends Controller
             $title = $_POST['title'];
             $new_content = $_POST['content'];
             for($i = 0; $i < count($new_content); $i++) {
-                if($new_content[$i] == '' && $id != 0) 
-                    $note->delete_item($content[$i]['id']);
-                else {
-                    $content[$i]['content'] = $new_content[$i];
-                }
+                $content[$i]['content'] = $new_content[$i];
             }
             $title_errors = $user->validate_name($title); 
             $title_errors = array_merge($title_errors, $user->validate_title_note($id, $title));
-            //pour ajouter un nouveau item quand on édite la checklist note
-            if (isset($_POST['item_content']) && $_POST['item_content'] != '' && count($title_errors) == 0) { 
-                $item_content = $_POST['item_content'];
-                //vérifier l'unicité du nouveau item
-                if (in_array($item_content, $new_content)) 
-                    $item_content_error = "Item must be unique"; 
-                if ($item_content_error == "") {
-                    $note->add_item($id, $item_content);
+        
+            // vérifier l'unicité des items 
+            for($i = 0; $i < count($new_content); $i++) {
+                $items_errors[$i] = CheckListNote::validateItems($new_content[$i], $new_content, $id, false);
+            }
+            $error_empty_items = $this->allEmpty($new_content) ? "at least one item " : ""; // pour avoir au moins un élément dans la checklist
+            // ajouter un nouveau item quand on édite la checklist note via le bouton + ou le bouton save
+            if (isset($_POST['new_item']) && $_POST['new_item'] != '' && count($title_errors) == 0) { 
+                $new_item = $_POST['new_item'];
+                //vérifier l'unicité et la longueur du nouveau item 
+                $new_item_error = CheckListNote::validateItems($new_item, $new_content, $id, true); 
+                if (empty($new_item_error)) {
+                    $note->add_item($id, $new_item);
                     $this->redirect("note", "edit_checklist_note/$id");
                 }
             }
-            // pour supprimer un item pendant le edit checklist note 
+            // pour supprimer un item pendant le edit checklist note via le bouton -
             if (isset($_POST['delete_item']) && count($title_errors) == 0) {
                 $item_id = $_POST['delete_item'];
                 $note->delete_item($item_id);
                 $this->redirect("note", "edit_checklist_note/$id");
             }
-            // vérifier l'unicité des items 
-            for($i = 0; $i < count($new_content); $i++) {
-                $items_errors[$i] = CheckListNote::validateItems($new_content[$i], $new_content);
-            }
-            $error_empty_items = $this->allEmpty($new_content) ? "at least one " : "";
-            var_dump($error_empty_items);
-            var_dump($this->allEmpty($new_content));
-           
-        
-            if(empty($title_errors) && $this->allEmpty($items_errors) && $item_content_error == "" && $error_empty_items = "") {
+            if(empty($title_errors) && $this->allEmpty($items_errors) && empty($new_item_error) && $error_empty_items == "") {
             
                 if($id == 0) {
                     $note = new CheckListNote($title, $user->id, Date("Y-m-d H:i:s"));
@@ -176,11 +170,11 @@ class ControllerNote extends Controller
            $this->redirect("open_note", "index/$note->note_id");
             }
         }
-        var_dump($error_empty_items); 
+    
     }
     (new view("add_checklist_note"))->show(["title_errors"=> $title_errors,"items_errors" => $items_errors, 
-                                                 'title' =>$title, 'content' => $content, 'id' => $id, 'item_content'=>$item_content,
-                                                  'item_content_error' =>$item_content_error, 'itemless' => $error_empty_items]);
+                                                 'title' =>$title, 'content' => $content, 'id' => $id, 'new_item'=>$new_item,
+                                                  'new_item_error' =>$new_item_error, 'itemless' => $error_empty_items]);
                                                 }
 
     public static function allEmpty($array) {
@@ -216,24 +210,7 @@ class ControllerNote extends Controller
             $this->redirect("note", "edit_checklist_note/$note_id");
         }
     }
-         
-    
 
-  /*  public function drag_and_drop() {
-        
-        if(isset($_POST['arrayorder'] , $_POST['update'])) {
-            $array = $_POST['arrayorder'];
-            if($_POST['update'] == "update") {
-                $count = 1;
-                foreach ($array as $idval) {
-                    NOTE::update_drag_and_drop($count, $idval);
-                    $count++;
-    }
-
-}
-    }
-        
-    }*/
     public function drag_and_drop() {
         if (isset($_POST['update']) && $_POST['update'] === 'update') {
             if (isset($_POST['order_pinned'])) {
@@ -308,13 +285,8 @@ class ControllerNote extends Controller
         if (isset($_GET['param1'])) {
             $note_id = $_GET['param1'];
             $note = Note::get_note_by_id($note_id);
-        
-        
-            $user = $this->get_user_or_redirect();
-
-      
-           
-            if ($user->id == $note->owner || $user->role == "admin") {
+             $user = $this->get_user_or_redirect();
+             if ($user->id == $note->owner || $user->role == "admin") {
             $note->delete($user);
           
             echo json_encode(['status' => 'success']);
@@ -357,6 +329,7 @@ class ControllerNote extends Controller
     }
 
     public function open_labels()  {
+        $errors = [];
         if (isset($_GET['param1']) && isset($_GET['param1']) !=="") {
             $label = '';
             $note_id = $_GET['param1'];
@@ -368,7 +341,7 @@ class ControllerNote extends Controller
             $other_labels = $note->other_labels($note_id, $user_id);
             var_dump($other_labels);
             
-            $errors = [];
+      
             if (isset($_POST['delete'])) {
                 $label = $_POST['delete'];
                 $note->delete_label($note_id, $label);
@@ -389,6 +362,19 @@ class ControllerNote extends Controller
         
     }
 }
+    public function label_is_unique() {
+        $res = "false";
+        if (isset ($_GET['param1']) && $_GET['param1'] !== ""
+            && isset($_GET['param2']) && $_GET['param2'] !== "") {
+                $note = Note::get_note_by_id($_GET['param1']);
+                $error = $note->same_label($_GET['param2']);
+                if (!empty($error)) {
+                     $res = "true";
+                }
+                   
+            }
+            echo $res;
+    }
     public function editor_and_delete_btn() {
         if(isset($_GET['param1']) && isset($_GET['param1']) !=="" 
         && isset($_GET['param2']) && isset($_GET['param1']) !=="") {
@@ -478,7 +464,8 @@ class ControllerNote extends Controller
         if (isset ($_GET['param1']) && $_GET['param1'] !== ""
             && isset($_GET['param2']) && $_GET['param2'] !== "") {
                 $user = $this->get_user_or_redirect();
-                $error = $user->validate_title_note($_GET['param1'], $_GET['param2']);
+                $title = trim($_GET['param2']);
+                $error = $user->validate_title_note($_GET['param1'], $title);
                 if (!empty($error)) {
                      $res = "true";
                 }

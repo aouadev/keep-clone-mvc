@@ -69,25 +69,24 @@ class CheckListNote extends Note
         ["id"=> $this->note_id]);
     }
 
-    public static function validateItems($item, $array_items) : array {
+    public static function validateItems($item, $array_items, $id, $add_new) : array {
         $errors = [];
         $min_length = Configuration::get('item_min_length');
         $max_length = Configuration::get('item_max_length');
-        if($item != "") {
-        if ((strlen($item) < $min_length) || (strlen($item) > $max_length)) {
+  
+        if (($id != 0 && strlen($item) < $min_length) || (strlen($item) > $max_length)) {
             $errors[] ="Item length must be between $min_length and $max_length char";
         }
     
         $occurences = array_filter($array_items, function($e) use ($item) {
                 return $e == $item;
         });
-        if (count($occurences) > 1) {
-            $errors[] = "Item must be unique";
-        }
-    }
+        if (count($occurences) > ($add_new ? 0 : 1 ) && strlen($item) > 0) { // un boolean add_new pour pouvoir utiliser cette méthode dans la validation 
+            $errors[] = "Item must be unique";                              // d'un nouveau item dans le cas d'édition d'une note, dans ce cas le item n'est pas 
+        }                                                                   //  dans la liste des items donc occurence doit être 0
         return $errors;
     
-        
     }
+  
 
 }

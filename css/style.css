@@ -9,7 +9,6 @@ body{
 /*login et signup*/
 .container_login_signup {
   max-width: 500px;
-
   padding: 0 20px;
   margin: 170px auto;
 }
@@ -53,7 +52,7 @@ body{
 
 .main_login_signup form .inputbox input {
   outline: none;
-  background: transparent;
+  background:   #2d3442;
   padding-left: 20px;
   color: white;
   font-size: 17px;
@@ -82,6 +81,9 @@ body{
   border-radius: 0 7px 0 7px 0;
   background: #2d3442;
 
+}
+input::placeholder {
+  color: gray;
 }
 
 .main_login_signup form .inputbox i {
@@ -114,6 +116,7 @@ body{
 .main_login_signup form .text input {
   color: white;
   font-size: 17px;
+  
 }
 
 .main_login_signup form .subscribe-link a {
@@ -132,9 +135,10 @@ body{
 }
 
 .errors {
-  color:rgb(255, 0, 81);
-  font-weight: 300;
+  color:rgb(189, 76, 102);
+  font-weight: 450;
   font-size: 15px;
+  position: relative;
   
 }
 
@@ -677,7 +681,7 @@ nav a {
 #errDescription {
   position: absolute;
   left: 3%;
-  top: 750px;
+  top: 735px;
   
 }
 
@@ -859,11 +863,23 @@ input:focus, textarea:focus {
   
   
 }
+.err_item_edit {
+  position: absolute;
+  top:41px;
+  display:flexbox;
+  
+}
+#errNewItem {
+  position:relative;
+
+}
 .edit_cn_item {
   
   position: relative;
   display: flex;
-  margin:0 0 20px 20px;
+  
+  
+  margin:0 0 25px 20px;
 }
 .add_cn_check_icon {
   background:#383c44;
@@ -1052,6 +1068,7 @@ input:focus, textarea:focus {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   width: 50px;
+  
 }
 .view-share-title {
   font-size: 15px;
@@ -1264,6 +1281,12 @@ form .add_label input {
   margin-left: 2%;
 
 }
-#error_item_empty {
-  background: #0652DD;
+#error_items_empty {
+  position: relative;
+  top: 230px;
+  left: 3%;
+}
+.form-control:focus {
+  background-color: transparent;
+  color: lightgray;
 }
